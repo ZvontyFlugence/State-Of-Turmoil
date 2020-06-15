@@ -1,0 +1,33 @@
+.sot-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.sot-dropbtn-content {
+  display: none;
+  position: absolute;
+  left: 100%;
+  top: 0%;
+  background-color: #252525;
+  min-width: 150px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 2;
+}
+
+.sot-dropbtn-content p {
+  color: white;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  margin: 0 auto;
+}
+
+.sot-dropbtn-content p:hover {
+  background-color: #12121271;
+  color: white;
+  cursor: pointer;
+}
+
+.sot-dropdown:hover .sot-dropbtn-content {
+  display: block;
+}

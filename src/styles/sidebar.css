@@ -1,0 +1,83 @@
+.side-nav-container {
+  width: 5vw;
+}
+
+.side-nav {
+  display: flex;
+  justify-content: center;
+  height: 83vh;
+}
+
+.side-nav-lg-hidden {
+  display: none;
+}
+
+.side-nav-lg {
+  display: flex;
+  justify-content: center;
+  align-content: center;
+}
+
+.side-nav-item {
+  font-size: 1.5em !important;
+  margin-bottom: 1vh !important;
+  border-radius: 4px;
+  background-color: transparent !important;
+  outline: none !important;
+  border: none !important;
+}
+
+.side-nav-item:hover {
+  cursor: pointer;
+  background-color: #12121271 !important;
+  box-shadow: 1px 1px 5px black;
+}
+
+.side-nav-item:focus {
+  box-shadow: none !important;
+}
+
+.user-container {
+  text-align: left;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.user-container p {
+  text-align: left;
+  font-size: 16px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 2px;
+  font-weight: lighter;
+}
+
+.user-img {
+  margin: 0 auto;
+  width: 100px;
+  border-radius: 10px;
+}
+
+.user-name {
+  text-align: center !important;
+  font-size: 20px !important;
+  border: none !important;
+}
+
+.flag-icon {
+  font-size: 20px;
+  float: right;
+}
+
+.flag-icon:hover {
+  cursor: pointer;
+}
+
+#healthbar .p-progressbar-value {
+  background-color: #259b25 !important;
+}
+
+.p-progressbar {
+  background-color: #12121271 !important;
+}

@@ -1,0 +1,32 @@
+.navbar {
+  background-color: #252525;
+  height: 10vh;
+  padding: .5vh 1vw 1vh;
+  width: 100vw;
+}
+
+.navbar-brand {
+  cursor: pointer;
+}
+
+.brand {
+  height: 3em;
+  vertical-align: middle;
+  margin: 0 4px 10px  ;
+}
+
+.brand-text {
+  font-size: 24px;
+}
+
+@media screen and (max-width: 480px) {
+  .brand {
+    margin-right: 5vw;
+  }
+}
+
+@media screen and (min-width: 1024px) {
+  .brand {
+    margin-right: 1vw;
+  }
+}
