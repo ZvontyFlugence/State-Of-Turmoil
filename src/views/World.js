@@ -32,7 +32,7 @@ const World = props => {
   
     if (!existingScript) {
       const script = document.createElement('script');
-      script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyCkmSdTdoGFQC5ak4N4dTp4WuYmzzGfQe8';
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.REACT_APP_GMAP_KEY}`;
       script.id = 'googleMaps';
       script.async = true;
       script.defer = true;
