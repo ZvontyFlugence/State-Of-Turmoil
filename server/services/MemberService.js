@@ -4,9 +4,12 @@ const RegionService = require('./RegionService');
 
 const MemberService = {};
 const MemberActions = {
-  SEND_FRIEND_REQUEST: 'SEND_FRIEND_REQUEST',
+  DELETE_ALERT: 'DELETE_ALERT',
   HEAL: 'HEAL',
+  READ_ALERT: 'READ_ALERT',
+  SEND_FRIEND_REQUEST: 'SEND_FRIEND_REQUEST',
   TRAIN: 'TRAIN',
+  UPDATE_DESC: 'UPDATE_DESC',
   UPLOAD: 'UPLOAD',
 };
 
@@ -59,14 +62,31 @@ MemberService.getUser = async id => {
   return await users.findOne({ _id: id });
 }
 
+MemberService.getAllUsers = async () => {
+  const user_coll = db.getDB().collection('users');
+  let users = await user_coll.find({}).toArray();
+
+  if (users) {
+    return Promise.resolve({ status: 200, payload: { users } });
+  }
+  const payload = { error: 'No Users Found' };
+  return Promise.reject({ status: 404, payload });
+}
+
 MemberService.doAction = async (id, body) => {
   switch (body.action.toUpperCase()) {
-    case MemberActions.SEND_FRIEND_REQUEST:
-      return await send_friend_request(id, body.friend_id);
+    case MemberActions.DELETE_ALERT:
+      return await delete_alert(id, body.alert);
     case MemberActions.HEAL:
       return await heal(id);
+    case MemberActions.READ_ALERT:
+      return await read_alert(id, body.alert);
     case MemberActions.TRAIN:
       return await train(id);
+    case MemberActions.SEND_FRIEND_REQUEST:
+      return await send_friend_request(id, body.friend_id);
+    case MemberActions.UPDATE_DESC:
+      return await update_desc(id, body.desc);
     case MemberActions.UPLOAD:
       return await upload(id, body.image);
     default:
@@ -167,5 +187,56 @@ const send_friend_request = async (id, friend_id) => {
   return Promise.reject({ status: 500, payload: { success: false, error: 'Something Unexpected Happened!' } });
 }
 
+const read_alert = async (id, alert) => {
+  const user = await MemberService.getUser(id);
+  const users = db.getDB().collection('users');
+
+  if (alert.index > -1) {
+    user.alerts[alert.index].read = true;
+    let updated_user = await users.findOneAndUpdate({ _id: user._id }, { $set: { alerts: user.alerts } });
+    if (updated_user) {
+      return Promise.resolve({ status: 200, payload: { success: true } })
+    } else {
+      const payload = { success: false, error: 'Something Unexpected Happened' };
+      return Promise.reject({ status: 500, payload });
+    }
+  }
+
+  const payload = { success: false, error: 'Alert Not Found' };
+  return Promise.reject({ status: 404, payload });
+}
+
+const delete_alert = async (id, alert) => {
+  const user = await MemberService.getUser(id);
+  const users = db.getDB().collection('users');
+
+  if (alert.index > -1) {
+    user.alerts.splice(alert.index, 1);
+    let updated_user = await users.findOneAndUpdate({ _id: user._id }, { $set: { alerts: user.alerts } });
+
+    if (updated_user) {
+      return Promise.resolve({ status: 200, payload: { success: true } });
+    } else {
+      const payload = { success: false, error: 'Something Unexpected Happened' };
+      return Promise.reject({ status: 500, payload });
+    }
+  }
+
+  const payload = { success: false, error: 'Alert Not Found' };
+  return Promise.reject({ status: 404, payload });
+}
+
+const update_desc = async (id, description) => {
+  const users = db.getDB().collection('users');
+
+  let updated_user = await users.findOneAndUpdate({ _id: id }, { $set: { description } });
+
+  if (updated_user) {
+    return Promise.resolve({ status: 200, payload: { success: true } });
+  }
+  
+  const payload = { success: false, error: 'Something Unexpected Happened' };
+  return Promise.reject({ status: 500, payload });
+}
 
 module.exports = MemberService;

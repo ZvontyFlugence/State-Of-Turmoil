@@ -23,10 +23,14 @@ SoTApi.register = payload => client.post('/auth/register', payload);
 
 // User
 SoTApi.getUser = () => client.get('/user');
+SoTApi.getUsers = () => client.get('/user/all');
 SoTApi.getProfile = id => client.get(`/user/${id}`);
 SoTApi.getLocationInfo = () => client.get('/user/location-info');
 SoTApi.getWalletInfo = () => client.get('/user/wallet-info');
 SoTApi.doAction = payload => client.patch('/user/action', payload);
+
+// Stats
+SoTApi.getCitizenStats = payload => client.patch('/stats/citizens', payload);
 
 // Map
 SoTApi.getMapRegions = () => client.get('/regions');

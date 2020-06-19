@@ -95,8 +95,8 @@ const Sidebar = props => {
             <DropButton classes='side-nav-item' icon='pi pi-home' tooltip='My Places' position='bottom' items={constants.MY_PLACES} />
             <DropButton classes='side-nav-item' icon='pi pi-shopping-cart' tooltip='Markets' position='bottom' items={constants.MARKETS} />
             <Button className='side-nav-item' icon='pi pi-bookmark' tooltip='Battles' onClick={() => history.push('/battles')} />
-            <Button className='side-nav-item' icon='pi pi-globe' tooltip='World' onClick={() => history.push('/world')} />
             <DropButton classes='side-nav-item' icon='pi pi-users' tooltip='Society' position='top' items={constants.SOCIETY} />
+            <Button className='side-nav-item' icon='pi pi-globe' tooltip='World' onClick={() => history.push('/world')} />
             <Button className='side-nav-item' icon='pi pi-cog' tooltip='Settings' onClick={() => history.push('/settings')} />
           </Card>
         </div>

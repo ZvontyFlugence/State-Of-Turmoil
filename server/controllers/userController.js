@@ -14,6 +14,11 @@ router.get('/', auth, async (req, res) => {
   return res.status(404).json({ error: 'User Not Found' });
 });
 
+router.get('/all', auth, async (req, res) => {
+  let result = await MemberService.getAllUsers();
+  return res.status(result.status).json(result.payload);
+});
+
 router.get('/location-info', auth, async (req, res) => {
   const user = await MemberService.getUser(req.user_id);
   // Get CS Info

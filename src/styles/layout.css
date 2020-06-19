@@ -1,0 +1,36 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #121212;
+  color: #dedede;
+  height: 100vh;
+  overflow: hidden;
+}
+
+#header {
+  height: 10vh;
+  background-color: #252525;
+}
+
+#main {
+  height: 85vh;
+}
+
+#footer {
+  min-height: 5vh;
+  padding: 10px;
+  background-color: #252525;
+}
+
+.p-growl-message {
+  width: 180px !important;
+  margin-right: 0px !important;
+}
+
+.p-growl-details {
+  margin: 0 auto;
+}

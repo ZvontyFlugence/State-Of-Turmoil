@@ -21,6 +21,7 @@ db.connect(err => {
 
 const authController = require('./controllers/authController');
 const userController = require('./controllers/userController');
+const statsController = require('./controllers/statsController');
 
 app.use(helmet());
 app.use(cors());
@@ -28,6 +29,7 @@ app.use(express.json());
 
 app.use('/auth', authController);
 app.use('/user', userController);
+app.use('/stats/', statsController);
 
 app.get('/regions', async (req, res) => {
   const regions = db.getDB().collection('regions');

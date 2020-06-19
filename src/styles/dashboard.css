@@ -2,3 +2,8 @@
   background-color: transparent !important;
   border-color: #555555 !important;
 }
+
+.alert-context {
+  top: 20% !important;
+  left: 20% !important;
+}

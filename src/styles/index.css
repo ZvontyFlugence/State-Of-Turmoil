@@ -1,36 +1,38 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background-color: #121212;
-  color: #dedede;
-  height: 100vh;
-  overflow: hidden;
+.home-centered {
+  display: flex;
+  justify-content: center;
 }
 
-#header {
-  height: 10vh;
-  background-color: #252525;
+.home-centered .gutter {
+  margin-right: 1vw;
 }
 
-#main {
-  height: 85vh;
+#logo {
+  height: 200px;
 }
 
-#footer {
-  min-height: 5vh;
-  padding: 10px;
-  background-color: #252525;
+.sot-fake-disabled {
+  opacity: 1 !important;
 }
 
-.p-growl-message {
-  width: 180px !important;
-  margin-right: 0px !important;
+.p-listbox-item {
+  outline: 1px solid #121212;
 }
 
-.p-growl-details {
-  margin: 0 auto;
+.p-listbox-item:focus {
+  box-shadow: none !important;
+}
+
+.flag-icon {
+  border-radius: 4px;
+  vertical-align: bottom;
+}
+
+.top-countries-flag {
+  font-size: 32px !important;
+}
+
+.country span {
+  margin-left: 10px;
+  font-size: 24px;
 }

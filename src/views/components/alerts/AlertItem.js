@@ -1,16 +1,43 @@
-import React, { useState } from 'react';
+import React, { useRef } from 'react';
+import { connect } from 'react-redux';
 import moment from 'moment';
+import SoTApi from 'services/SoTApi';
+import authActions from 'store/auth/actions';
 
 // PrimeReact
-import { Checkbox } from 'primereact/checkbox';
+import { ContextMenu } from 'primereact/contextmenu';
 
 const AlertItem = props => {
-  const [checked, setChecked] = useState(false);
+  let cm = useRef(null);
 
-  const handleCheck = e => {
-    setChecked(e.checked);
-    // TODO: Call Parent Funtion to add alert to selected array
-  }
+  const items = [
+    {
+      label: 'Mark as Read',
+      icon: 'pi pi-eye',
+      command: () => {
+        props.alert.index = props.index;
+        SoTApi.doAction({ action: 'read_alert', alert: props.alert })
+          .then(data => {
+            if (data.success) {
+              props.loadUser();
+            }
+          });
+      }
+    },
+    {
+      label: 'Delete',
+      icon: 'pi pi-trash',
+      command: () => {
+        props.alert.index = props.index;
+        SoTApi.doAction({ action: 'delete_alert', alert: props.alert })
+          .then(data => {
+            if (data.success) {
+              props.loadUser();
+            }
+          });
+      }
+    },
+  ];
 
   const getTimestamp = () => {
     return <span>{ moment(props.alert.timestamp).fromNow() }</span>
@@ -31,23 +58,27 @@ const AlertItem = props => {
   };
 
   return (
-    <div className='p-clearfix'>
-      <div className='p-grid p-justify-start' style={{ textAlign: 'left' }}>
-        <div className='p-col-fixed' style={{ width: '30px', paddingBottom: '0px' }}>
-          <Checkbox onChange={handleCheck} checked={checked} />
-        </div>
-        <div className='p-col-2' style={{ paddingBottom: '0px' }}>
-          { getTimestamp() }
-        </div>
-        <div className='p-col' style={{ paddingBottom: '0px', fontWeight: props.alert.read ? 'lighter' : 'bold' }}>
-          { props.alert.message }
-        </div>
-        <div className='p-col-2' style={{ paddingBottom: '0px', textAlign: 'right' }}>
-          { getActions(props.alert.type) }
+    <>
+      <ContextMenu className='alert-context' model={items} ref={cm} />
+      <div className='p-clearfix' onContextMenu={e => cm.current.show(e)}>
+        <div className='p-grid p-justify-start' style={{ textAlign: 'left' }}>
+          <div className='p-col-2' style={{ paddingBottom: '0px' }}>
+            { getTimestamp() }
+          </div>
+          <div className='p-col' style={{ paddingBottom: '0px', fontWeight: props.alert.read ? 'lighter' : 'bold' }}>
+            { props.alert.message }
+          </div>
+          <div className='p-col-2' style={{ paddingBottom: '0px', textAlign: 'right' }}>
+            { getActions(props.alert.type) }
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
-export default AlertItem;
+const mapDispatchToProps = dispatch => ({
+  loadUser: () => dispatch(authActions.loadUser()),
+});
+
+export default connect(null, mapDispatchToProps)(AlertItem);

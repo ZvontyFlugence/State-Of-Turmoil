@@ -10,9 +10,6 @@ import { Growl } from 'primereact/growl';
 // Components
 import Private from './layouts/private';
 
-// Styles
-
-
 const World = props => {
   let history = useHistory();
   const [overlays, setOverlays] = useState([]);

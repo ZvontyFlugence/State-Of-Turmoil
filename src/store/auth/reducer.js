@@ -25,6 +25,7 @@ export default function (state = initialState, action) {
     case types.AUTH_VALID:
     case types.USER_LOADED:
       const { user } = action.payload;
+
       return {
         isAuthenticated: true,
         isLoading: false,

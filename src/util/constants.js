@@ -1,6 +1,6 @@
 const constants = {
   MY_PLACES: [
-    { label: 'Training Center', link: '/train' },
+    { label: 'My Home', link: '/home' },
     { label: 'My Companies', link: '/companies' },
     { label: 'My Party', link: `/party` },
     { label: 'My Unit', link: `/unit` },
@@ -14,6 +14,7 @@ const constants = {
   SOCIETY: [
     { label: 'Region', link: '/region' },
     { label: 'Country', link: '/country' },
+    { label: 'Elections', link: '/elections' },
     { label: 'Rankings', link: '/rankings' },
   ],
 };
