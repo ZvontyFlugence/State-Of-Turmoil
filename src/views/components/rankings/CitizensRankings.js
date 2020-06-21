@@ -1,31 +1,83 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router';
 import SoTApi from 'services/SoTApi';
+import constants from 'util/constants';
 
 // PrimeReact
 import { Card } from 'primereact/card';
 import { DataView } from 'primereact/dataview';
+import { Dropdown } from 'primereact/dropdown';
+import { Toolbar } from 'primereact/toolbar';
+import { SelectButton } from 'primereact/selectbutton';
 
-const CitizensRankings = props => {
+const CitizensRankings = () => {
   let history = useHistory();
+  const [stat, setStat] = useState('xp');
   const [citizens, setCitizens] = useState([]);
+  const [country, setCountry] = useState('global');
 
   useEffect(() => {
     if (citizens.length === 0) {
-      SoTApi.getCitizenStats({ stat: 'xp' }).then(data => {
+      let payload = { stat };
+
+      if (country !== 'global') {
+        payload.country = country;
+      }
+
+      SoTApi.getCitizenStats(payload).then(data => {
         if (data.citizens) {
           setCitizens(data.citizens);
         }
       });
-    } else {
-      console.log(citizens);
     }
   });
 
+  const handleChangeCountry = value => {
+    setCountry(value);
+    setCitizens([]);
+  }
+
+  const handleChangeStat = value => {
+    setStat(value);
+    setCitizens([]);
+  }
+
+  const getStatName = () => {
+    switch (stat) {
+      case 'strength':
+        return 'Strength';
+      case 'xp':
+      default:
+        return 'XP';
+    }
+  }
+
   const renderHeader = () => {
     return (
-      <div className='p-grid'>
-        <h2 style={{ margin: '10px 10px 0px' }}>Citizen Rankings</h2>
+      <div className='p-grid' style={{ margin: '0px' }}>
+        <div className='p-col-fixed' style={{ padding: '0px', margin: '0px', width: '45px', textAlign: 'left' }}>
+          <span>Rank</span>
+        </div>
+        <div className='p-col' style={{ padding: '0px', margin: '0px' }}>
+          <span>Citizen</span>
+        </div>
+        <div className='p-col' style={{ padding: '0px', margin: '0px' }}>
+          <span>Country</span>
+        </div>
+        <div className='p-col' style={{ padding: '0px', margin: '0px', textAlign: 'right' }}>
+          <span>{ getStatName() }</span>
+        </div>
+      </div>
+    );
+  }
+
+  const countryTemplate = country => {
+    return (
+      <div className='p-grid' style={{ margin: '0px' }}>
+        {country.value !== 'global' && (
+          <i className={`flag-icon flag-icon-${country.value}`} style={{ marginRight: '5px' }}/>
+        )}
+        <p style={{ margin: '0px' }}>{ country.label }</p>
       </div>
     );
   }
@@ -35,7 +87,7 @@ const CitizensRankings = props => {
 
     return (
       <div className='p-grid' style={{ paddingTop: rank === 1 ? '10px' : '5px' }}>
-        <div className='p-col-1'>
+        <div className='p-col-fixed' style={{ width: '65px' }}>
           <p style={{ textAlign: 'center' }}>{ rank }</p>
         </div>
         <div className='p-col' style={{ cursor: 'pointer' }} onClick={() => history.push(`/profile/${citizen._id}`)}>
@@ -47,7 +99,7 @@ const CitizensRankings = props => {
           <span style={{ fontSize: '18px' }}>{ citizen.country.name }</span>
         </div>
         <div className='p-col' style={{ textAlign: 'right' }}>
-          <p>{ citizen.xp } XP</p>
+          <p>{ citizen[stat] } { getStatName() }</p>
         </div>
       </div>
     );
@@ -55,14 +107,36 @@ const CitizensRankings = props => {
 
   if (citizens.length > 0) {
     return (
-      <DataView
-        value={citizens}
-        header={renderHeader()}
-        itemTemplate={citizenTemplate}
-        rows={Math.min(citizens.length, 10)}
-        paginatorPosition='bottom'
-        paginator
-      />
+      <>
+        <Toolbar style={{ marginBottom: '10px' }}>
+          <div className='p-toolbar-group-left' style={{ width: '50%' }}>
+            <Dropdown
+              value={country}
+              options={constants.COUNTRIES}
+              onChange={e => handleChangeCountry(e.value)}
+              itemTemplate={countryTemplate}
+              style={{ width: '200px' }}
+            />
+          </div>
+          <div className='p-toolbar-group-right' style={{ width: '50%', textAlign: 'right' }}>
+            <div className='p-grid p-nogutter p-justify-end p-align-center'>
+              <SelectButton
+                value={stat}
+                options={constants.CITIZEN_RANKINGS}
+                onChange={e => handleChangeStat(e.value)}
+              />
+            </div>
+          </div>
+        </Toolbar>
+        <DataView
+          value={citizens}
+          header={renderHeader()}
+          itemTemplate={citizenTemplate}
+          rows={Math.min(citizens.length, 10)}
+          paginatorPosition='bottom'
+          paginator
+        />
+      </>
     );
   } else {
     return <Card>No Citizens Found</Card>;

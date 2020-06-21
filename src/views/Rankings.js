@@ -20,6 +20,8 @@ const Rankings = () => {
               </TabPanel>
               <TabPanel header='Countries' disabled></TabPanel>
               <TabPanel header='Parties' disabled></TabPanel>
+              <TabPanel header='Military Units' disabled></TabPanel>
+              <TabPanel header='Newspapers' disabled></TabPanel>
             </TabView>
           </div>
         </div>

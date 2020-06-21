@@ -9,6 +9,9 @@ body {
   color: #dedede;
   height: 100vh;
   overflow: hidden;
+  background-image: url('/background.jpg');
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 #header {
@@ -33,4 +36,17 @@ body {
 
 .p-growl-details {
   margin: 0 auto;
+}
+
+.flag-inline-left, .flag-inline-right {
+  float: none !important;
+  vertical-align: middle !important;
+}
+
+.flag-inline-left {
+  margin-right: 15px;
+}
+
+.flag-inline-right {
+  margin-left: 15px;
 }

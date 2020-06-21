@@ -25,7 +25,7 @@ router.get('/location-info', auth, async (req, res) => {
   const csCountry = await CountryService.getCountry(user.country);
   // Get Region Info
   const region = await RegionService.getRegion(user.location);
-  const regionOwner = await CountryService.getCountry(region.owner);
+  const regionOwner = await CountryService.getCountry(region.owner._id);
 
   let country_info = { name: csCountry.name, flag: csCountry.flag_code };
   let region_info = {
@@ -45,7 +45,7 @@ router.get('/location-info', auth, async (req, res) => {
 router.get('/wallet-info', auth, async (req, res) => {
   const user = await MemberService.getUser(req.user_id);
   const region = await RegionService.getRegion(user.location);
-  const regionOwner = await CountryService.getCountry(region.owner);
+  const regionOwner = await CountryService.getCountry(region.owner._id);
 
   let curr_cc = user.wallet.filter(cc => cc.currency === regionOwner.currency)[0];
   curr_cc.flag = regionOwner.flag_code;
@@ -77,7 +77,7 @@ router.get('/:id', auth, async (req, res) => {
   const profile = await MemberService.getUser(id);
   const country = await CountryService.getCountry(profile.country);
   const region = await RegionService.getRegion(profile.location);
-  const regionOwner = await CountryService.getCountry(region.owner);
+  const regionOwner = await CountryService.getCountry(region.owner._id);
 
   profile.country_info = {
     id: country._id,

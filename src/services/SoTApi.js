@@ -29,10 +29,13 @@ SoTApi.getLocationInfo = () => client.get('/user/location-info');
 SoTApi.getWalletInfo = () => client.get('/user/wallet-info');
 SoTApi.doAction = payload => client.patch('/user/action', payload);
 
+// Regions
+SoTApi.getRegion = id => client.get(`/regions/${id}`);
+
 // Stats
 SoTApi.getCitizenStats = payload => client.patch('/stats/citizens', payload);
 
 // Map
-SoTApi.getMapRegions = () => client.get('/regions');
+SoTApi.getMapRegions = () => client.get('/map/regions');
 
 export default SoTApi;
