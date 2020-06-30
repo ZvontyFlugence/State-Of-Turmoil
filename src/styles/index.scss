@@ -1,0 +1,40 @@
+#index {
+  .home-centered {
+    display: flex;
+    justify-content: center;
+  }
+
+  .home-centered .gutter {
+    margin-right: 1vw;
+  }
+
+  #logo {
+    height: 200px;
+  }
+
+  .sot-fake-disabled {
+    opacity: 1 !important;
+  }
+
+  .p-listbox-item {
+    outline: 1px solid #121212;
+  }
+
+  .p-listbox-item:focus {
+    box-shadow: none !important;
+  }
+
+  .top-countries-flag {
+    font-size: 32px !important;
+    vertical-align: bottom;
+  }
+
+  .country span {
+    margin-left: 10px;
+    font-size: 24px;
+  }
+}
+
+.flag-icon {
+  border-radius: 4px;
+}

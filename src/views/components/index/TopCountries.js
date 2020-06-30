@@ -6,7 +6,7 @@ import { ListBox } from 'primereact/listbox';
 
 const options = [
   { name: 'United States', code: 'us'},
-  { name: 'Serbia', code: 'rs' },
+  { name: 'Spain', code: 'es' },
   { name: 'Brazil', code: 'br' },
   { name: 'Poland', code: 'pl' },
   { name: 'Iran', code: 'ir' }

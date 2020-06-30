@@ -1,5 +1,6 @@
 import React from 'react';
 import { useHistory } from 'react-router';
+import { connect } from 'react-redux';
 import SoTApi from 'services/SoTApi';
 
 // PrimeReact
@@ -13,9 +14,9 @@ const ProfileHead = props => {
     SoTApi.doAction({ action: 'send_friend_request', friend_id: props.profile._id })
       .then(data => {
         if (data.success) {
-          // TODO: Display Growl
+          props.growl.show({ severity: 'success', summary: 'Friend Request Sent' });
         } else {
-          // TODO: Display Growl
+          props.growl.show({ severity: 'error', summary: 'Friend Request Failed', detail: 'Something went wrong' });
         }
       });
   }
@@ -74,4 +75,8 @@ const ProfileHead = props => {
   );
 }
 
-export default ProfileHead;
+const mapStateToProps = state => ({
+  growl: state.growl.el,
+});
+
+export default connect(mapStateToProps)(ProfileHead);

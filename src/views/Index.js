@@ -10,14 +10,14 @@ import Public from './layouts/public';
 import TopCountries from './components/index/TopCountries';
 
 // Styles
-import 'styles/index.css';
+import 'styles/index.scss';
 
 const Index = () => {
   let history = useHistory();
 
   return (
     <Public>
-      <div id='home'>
+      <div id='index'>
         <div className='p-col home-centered'>
           <img id='logo' src='/SoT.svg' alt='' />
         </div>

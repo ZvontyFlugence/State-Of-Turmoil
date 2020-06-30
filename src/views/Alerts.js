@@ -15,6 +15,7 @@ import Private from './layouts/private';
 
 const Alerts = props => {
 
+  // TODO: Fix error
   const markAllAsRead = () => {
     Promise.all(props.user.alerts.forEach(async (alert, index) => {
       alert.index = index;
@@ -27,6 +28,7 @@ const Alerts = props => {
       });
   }
 
+  // TODO: Fix error
   const deleteAll = () => {
     Promise.all(props.user.alerts.forEach(async (alert, index) => {
       alert.index = index;
@@ -36,7 +38,7 @@ const Alerts = props => {
         if (values.every(d => d.success)) {
           props.loadUser();
         }
-      })
+      });
   }
 
   const alertTemplate = alert => {

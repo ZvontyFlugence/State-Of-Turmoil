@@ -23,14 +23,14 @@ const Home = props => {
 
   return (
     <Private>
-      <div id='train' style={{ paddingLeft: '1vw', paddingRight: '1vw' }}>
+      <div id='home' style={{ paddingLeft: '1vw', paddingRight: '1vw' }}>
         <h1>My Home</h1>
         <div className='p-grid p-dir-col'>
           <div className='p-col-10 p-offset-1'>
             <div className='p-grid'>
               <div className='p-col-3' style={{ textAlign: 'center' }}>
                 <Fieldset legend='Gym'>
-                  <p>Current Strength: { props.user && props.user.strength }</p>
+                  <p>Current Strength: { props.user && props.user.strength } <i className='sot-strength' /></p>
                   <Button label='Train' onClick={handleTraining} />
                 </Fieldset>
               </div>

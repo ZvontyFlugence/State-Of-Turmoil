@@ -19,6 +19,7 @@ import DropButton from 'views/components/DropButton';
 
 // Styles
 import 'styles/sidebar.css';
+import 'styles/assets.css'; 
 
 const Sidebar = props => {
   let history = useHistory();
@@ -121,8 +122,8 @@ const Sidebar = props => {
                 </Fieldset>
                 <br />
                 <Fieldset legend='Wallet'>
-                  <p>Gold: <span style={{ float: 'right' }}>{ props.user.gold.toFixed(2) }</span></p>
-                  <p>{ walletInfo.current.currency }: <span style={{ float: 'right' }}>{ walletInfo.current.amount.toFixed(2) } <i className={`flag-icon flag-icon-${walletInfo.current.flag}`} style={{ float: 'none' }}/></span></p>
+                  <p>Gold: <span style={{ float: 'right' }}>{ props.user.gold.toFixed(2) } <i className='sot-coin' /></span></p>
+                  <p>{ walletInfo.current.currency }: <span style={{ float: 'right' }}>{ walletInfo.current.amount.toFixed(2) } <i className={`flag-icon flag-icon-${regionInfo.owner_flag}`} style={{ float: 'none' }}/></span></p>
                 </Fieldset>
               </div>
             )}

@@ -1,0 +1,39 @@
+.sot-coin {
+  content: url('/assets/coin.svg');
+  width: 25px;
+  padding: 0px;
+  margin: 0px auto;
+  vertical-align: middle;
+}
+
+.sot-iron {
+  content: url('/assets/iron.svg');
+  width: 25px;
+  padding: 0px;
+  margin: 0px auto;
+  vertical-align: middle;
+}
+
+.sot-wheat {
+  content: url('/assets/wheat.svg');
+  width: 25px;
+  padding: 0px;
+  margin: 0px auto;
+  vertical-align: middle;
+}
+
+.sot-bread {
+  content: url('/assets/bread.svg');
+  width: 25px;
+  padding: 0px;
+  margin: 0px auto;
+  vertical-align: middle;
+}
+
+.sot-strength {
+  content: url('/assets/strong.svg');
+  width: 25px;
+  padding: 0px;
+  margin: 0px auto;
+  vertical-align: middle;
+}
