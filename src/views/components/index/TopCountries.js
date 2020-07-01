@@ -1,10 +1,11 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
+import SoTApi from 'services/SoTApi';
 
 // PrimeReact
 import { Card } from 'primereact/card';
 import { ListBox } from 'primereact/listbox';
 
-const options = [
+const defaultOptions = [
   { name: 'United States', code: 'us'},
   { name: 'Spain', code: 'es' },
   { name: 'Brazil', code: 'br' },
@@ -19,19 +20,37 @@ const template = option => (
   </div>
 );
 
-const TopCountries = () => (
-  <Card title='Top Countries'>
-    <ListBox
-      className='sot-fake-disabled'
-      options={options}
-      itemTemplate={template}
-      optionLabel='name'
-      optionValue='code'
-      style={{ width: 'inherit' }}
-      listStyle={{ overflow: 'hidden' }}
-      disabled
-    />
-  </Card>
-);
+const TopCountries = () => {
+  const [options, setOptions] = useState(defaultOptions);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    if (!loaded) {
+      SoTApi.getCountryStats({ stat: 'population', limit: 5 })
+        .then(data => {
+          if (data.countries) {
+            let countries = data.countries.map(c => ({ name: c.name, code: c.flag_code }));
+            setOptions(countries);
+            setLoaded(true);
+          }
+        })
+    }
+  });
+
+  return (
+    <Card title='Top Countries'>
+      <ListBox
+        className='sot-fake-disabled'
+        options={options}
+        itemTemplate={template}
+        optionLabel='name'
+        optionValue='code'
+        style={{ width: 'inherit' }}
+        listStyle={{ overflow: 'hidden' }}
+        disabled
+      />
+    </Card>
+  );
+};
 
 export default TopCountries;

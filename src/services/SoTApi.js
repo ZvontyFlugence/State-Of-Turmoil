@@ -34,6 +34,7 @@ SoTApi.getRegion = id => client.get(`/regions/${id}`);
 
 // Stats
 SoTApi.getCitizenStats = payload => client.patch('/stats/citizens', payload);
+SoTApi.getCountryStats = payload => client.patch('/stats/countries', payload);
 
 // Map
 SoTApi.getMapRegions = () => client.get('/map/regions');
