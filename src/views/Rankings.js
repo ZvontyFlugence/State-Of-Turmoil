@@ -6,6 +6,7 @@ import { TabView, TabPanel } from 'primereact/tabview';
 // Components
 import Private from './layouts/private';
 import CitizensRankings from './components/rankings/CitizensRankings';
+import CountryRankings from './components/rankings/CountryRankings';
 
 const Rankings = () => {
   return (
@@ -18,7 +19,9 @@ const Rankings = () => {
               <TabPanel header='Citizens'>
                 <CitizensRankings />
               </TabPanel>
-              <TabPanel header='Countries' disabled></TabPanel>
+              <TabPanel header='Countries'>
+                <CountryRankings />
+              </TabPanel>
               <TabPanel header='Parties' disabled></TabPanel>
               <TabPanel header='Military Units' disabled></TabPanel>
               <TabPanel header='Newspapers' disabled></TabPanel>

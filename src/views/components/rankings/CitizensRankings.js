@@ -44,6 +44,8 @@ const CitizensRankings = () => {
 
   const getStatName = () => {
     switch (stat) {
+      case 'strength':
+        return 'Strength';
       case 'xp':
         return 'XP';
       default:
@@ -98,7 +100,7 @@ const CitizensRankings = () => {
           <span style={{ fontSize: '18px' }}>{ citizen.country.name }</span>
         </div>
         <div className='p-col' style={{ textAlign: 'right' }}>
-          <p>{ citizen[stat] } { getStatName() || <i className='sot-strength' /> }</p>
+          <p>{ citizen[stat] } { getStatName() === 'Strength' ? <i className='sot-strength' /> : getStatName()}</p>
         </div>
       </div>
     );

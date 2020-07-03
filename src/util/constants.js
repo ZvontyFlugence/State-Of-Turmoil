@@ -29,6 +29,9 @@ const constants = {
     { label: 'Experience', value: 'xp' },
     { label: 'Strength', value: 'strength' },
   ],
+  COUNTRY_RANKINGS: [
+      { label: 'Population', value: 'population' },
+  ],
   MAP_STYLE: [
     {
         "featureType": "all",
