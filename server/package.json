@@ -10,6 +10,7 @@
     "helmet": "^3.22.0",
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^3.5.7",
+    "node-cron": "^2.0.3",
     "node-fetch": "^2.6.0",
     "nodemon": "^2.0.4",
     "path": "^0.12.7"
