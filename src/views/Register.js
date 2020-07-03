@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useHistory } from 'react-router';
 import SoTApi from 'services/SoTApi';
+import constants from 'util/constants';
 
 // PrimeReact
 import { Button } from 'primereact/button';
@@ -34,18 +35,14 @@ const Register = () => {
       });
   }
 
-  const countries = [
-    { label: 'United States', code: 'us', value: 1 },
-  ];
-
   const countryTemplate = option => {
     if (!option.value) {
-      return option.label;
+      return <span style={{ fontSize: '20px' }}>{option.label}</span>;
     } else {
       return (
         <div className='p-clearfix'>
-          <i className={`flag-icon flag-icon-${option.code}`} />
-          <span style={{ float: 'right', fontSize: 24 }}>
+          <i className={`flag-icon flag-icon-${option.code}`} style={{ float: 'none', marginRight: '10px' }} />
+          <span style={{ fontSize: '20px' }}>
             { option.label }
           </span>
         </div>
@@ -94,7 +91,7 @@ const Register = () => {
               <div className='p-inputgroup'>
                 <Dropdown
                   value={country}
-                  options={countries}
+                  options={constants.COUNTRIES}
                   onChange={e => setCountry(e.target.value)}
                   itemTemplate={countryTemplate}
                   placeholder='Select a Country'

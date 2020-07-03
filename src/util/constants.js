@@ -18,9 +18,12 @@ const constants = {
     { label: 'Rankings', link: '/rankings' },
   ],
   COUNTRIES: [
-    { label: 'Global', value: 'global' },
-    { label: 'Canada', value: 'ca' },
-    { label: 'United States', value: 'us' }
+    { label: 'Global', code: 'global', value: 0 },
+    { label: 'Canada', code: 'ca', value: 2 },
+    { label: 'Ireland', code: 'ie', value: 5 },
+    { label: 'Mexico', code: 'mx', value: 3 },
+    { label: 'United Kingdom', code: 'gb', value: 4 },
+    { label: 'United States', code: 'us', value: 1 }
   ],
   CITIZEN_RANKINGS: [
     { label: 'Experience', value: 'xp' },
