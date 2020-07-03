@@ -32,7 +32,11 @@ SoTApi.doAction = payload => client.patch('/user/action', payload);
 // Regions
 SoTApi.getRegion = id => client.get(`/regions/${id}`);
 
+// Shouts
+SoTApi.getShouts = payload => client.post('/shouts', payload);
+
 // Stats
+// TODO: Change from PATCH to POST requests
 SoTApi.getCitizenStats = payload => client.patch('/stats/citizens', payload);
 SoTApi.getCountryStats = payload => client.patch('/stats/countries', payload);
 

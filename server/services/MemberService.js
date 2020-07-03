@@ -1,6 +1,7 @@
 const db = require('../db');
 const CountryService = require('./CountryService');
 const RegionService = require('./RegionService');
+const ShoutsService = require('./ShoutsService');
 
 const MemberService = {};
 const MemberActions = {
@@ -8,6 +9,8 @@ const MemberActions = {
   HEAL: 'HEAL',
   READ_ALERT: 'READ_ALERT',
   SEND_FRIEND_REQUEST: 'SEND_FRIEND_REQUEST',
+  SHOUT: 'SHOUT',
+  SHOUT_REPLY: 'SHOUT_REPLY',
   TRAIN: 'TRAIN',
   UPDATE_DESC: 'UPDATE_DESC',
   UPLOAD: 'UPLOAD',
@@ -37,9 +40,17 @@ MemberService.createUser = async data => {
     gold: 5.00,
     strength: 0,
     location: location._id,
+    job: 0,
+    party: 0,
+    unit: 0,
+    newspaper: 0,
+    canTrain: new Date(Date.now()),
+    canWork: new Date(Date.now()),
     wallet: [{ currency: country.currency, amount: 25.00 }],
+    inventory: [],
     alerts: [],
     messages: [],
+    companies: [],
   };
 
   const res = await users.insertOne(user_doc);
@@ -85,6 +96,10 @@ MemberService.doAction = async (id, body) => {
       return await train(id);
     case MemberActions.SEND_FRIEND_REQUEST:
       return await send_friend_request(id, body.friend_id);
+    case MemberActions.SHOUT:
+      return await shout(id, body.shout);
+    case MemberActions.SHOUT_REPLY:
+      return await reply_to_shout(id, body.reply);
     case MemberActions.UPDATE_DESC:
       return await update_desc(id, body.desc);
     case MemberActions.UPLOAD:
@@ -237,6 +252,16 @@ const update_desc = async (id, description) => {
   
   const payload = { success: false, error: 'Something Unexpected Happened' };
   return Promise.reject({ status: 500, payload });
+}
+
+const shout = async (id, data) => {
+  data.user_id = id;
+  return ShoutsService.sendShout(data); 
+}
+
+const reply_to_shout = async (id, data) => {
+  data.user_id = id;
+  return ShoutsService.sendReply(data);
 }
 
 module.exports = MemberService;
