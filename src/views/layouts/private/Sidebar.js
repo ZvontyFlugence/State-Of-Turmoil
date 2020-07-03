@@ -15,6 +15,7 @@ import { ProgressBar } from 'primereact/progressbar';
 import { ProgressSpinner } from 'primereact/progressspinner';
 
 // Components
+import CountryFlag from 'views/components/CountryFlag';
 import DropButton from 'views/components/DropButton';
 
 // Styles
@@ -116,14 +117,16 @@ const Sidebar = props => {
                 <br />
                   <Button className='p-button-success' label='Heal' onClick={handleHeal} disabled={props.user.health === 100} />
                 <br />
-                <p>Citizenship: <i className={`flag-icon flag-icon-${countryInfo.flag}`} /></p>
                 <Fieldset legend='Location'>
-                  <p>{ regionInfo.name } <i className={`flag-icon flag-icon-${regionInfo.owner_flag}`} /></p>
+                  <p>
+                    <a href={`/region/${props.user.location}`}>{ regionInfo.name }</a>
+                    <CountryFlag countryID={regionInfo.owner._id} code={regionInfo.owner.flag} />
+                  </p>
                 </Fieldset>
                 <br />
                 <Fieldset legend='Wallet'>
                   <p>Gold: <span style={{ float: 'right' }}>{ props.user.gold.toFixed(2) } <i className='sot-coin' /></span></p>
-                  <p>{ walletInfo.current.currency }: <span style={{ float: 'right' }}>{ walletInfo.current.amount.toFixed(2) } <i className={`flag-icon flag-icon-${regionInfo.owner_flag}`} style={{ float: 'none' }}/></span></p>
+                  <p>{ walletInfo.current.currency }: <span style={{ float: 'right' }}>{ walletInfo.current.amount.toFixed(2) } <CountryFlag countryID={regionInfo.owner._id} code={regionInfo.owner.flag} flagStyle={{ float: 'none' }}/></span></p>
                 </Fieldset>
               </div>
             )}

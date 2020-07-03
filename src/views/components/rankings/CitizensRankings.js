@@ -44,11 +44,10 @@ const CitizensRankings = () => {
 
   const getStatName = () => {
     switch (stat) {
-      case 'strength':
-        return 'Strength';
       case 'xp':
-      default:
         return 'XP';
+      default:
+        return undefined;
     }
   }
 
@@ -74,8 +73,8 @@ const CitizensRankings = () => {
   const countryTemplate = country => {
     return (
       <div className='p-grid' style={{ margin: '0px' }}>
-        {country.value !== 'global' && (
-          <i className={`flag-icon flag-icon-${country.value}`} style={{ marginRight: '5px' }}/>
+        {country.code !== 'global' && (
+          <i className={`flag-icon flag-icon-${country.code}`} style={{ marginRight: '5px' }}/>
         )}
         <p style={{ margin: '0px' }}>{ country.label }</p>
       </div>
@@ -99,7 +98,7 @@ const CitizensRankings = () => {
           <span style={{ fontSize: '18px' }}>{ citizen.country.name }</span>
         </div>
         <div className='p-col' style={{ textAlign: 'right' }}>
-          <p>{ citizen[stat] } { getStatName() }</p>
+          <p>{ citizen[stat] } { getStatName() || <i className='sot-strength' /> }</p>
         </div>
       </div>
     );
