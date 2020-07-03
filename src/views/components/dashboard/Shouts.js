@@ -130,7 +130,7 @@ const Shouts = props => {
     <div key={index} className='p-grid'>
       <div className='p-col-2'>
         <a href={`/profile/${item.user}`}>
-          <img src={item.user_img} alt="" style={{ width: '100%', margin: '0 auto' }} />
+          <img src={item.user_img} alt="" style={{ width: '100%', margin: '0 auto', borderRadius: '10px' }} />
         </a>
       </div>
       <div className='p-col'>{item.message}</div>
