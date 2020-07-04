@@ -24,4 +24,14 @@ router.get('/:id', auth, async (req, res) => {
   return res.status(404).json({ error: 'Region Not Found' });
 });
 
+// Creates a new region
+router.post('/', async (req, res) => {
+  let region = await RegionService.createRegion(req.body);
+
+  if (region) {
+    return res.status(200).json({ success: true });
+  }
+  return res.status(500).json({ success: false });
+});
+
 module.exports = router;

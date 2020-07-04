@@ -44,6 +44,21 @@ const Region = props => {
     }
   });
 
+  const getResource = () => {
+    let resource = constants.RESOURCES[region.resource];
+
+    if (resource.css) {
+      return (
+        <span>
+          { resource.label }
+          <i className={resource.css} style={{ marginLeft: '10px' }} />
+        </span>
+      );
+    } else {
+      return <span>{ resource.label }</span>
+    }
+  }
+
   const loadGoogleMaps = callback => {
     const existingScript = document.getElementById('googleMaps');
 
@@ -86,10 +101,10 @@ const Region = props => {
                 </div>
                 <div className='p-col'>
                   <h1 style={{ fontWeight: 'lighter', marginTop: '0px', textAlign: 'left' }}>
-                    { region.name }
+                    { region.name } <i className={`flag-icon flag-icon-${region.owner.flag} flag-inline-right`} style={{ fontSize: '28px' }}/>
                   </h1>
-                  <p>Owner: { region.owner.name } <i className={`flag-icon flag-icon-${region.owner.flag} flag-inline-right`} /></p>
-                  <p>Resource: { region.resource }</p>
+                  <p>Core: { region.core.name } <i className={`flag-icon flag-icon-${region.core.flag} flag-inline-right`} /></p>
+                  <p>Resource: { getResource() }</p>
                 </div>
                 <div className='p-col-1' style={{ textAlign: 'right' }}>
                   {/* TODO: Hide if user is in this region */}

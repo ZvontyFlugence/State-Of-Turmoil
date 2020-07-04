@@ -32,6 +32,11 @@ const constants = {
   COUNTRY_RANKINGS: [
       { label: 'Population', value: 'population' },
   ],
+  RESOURCES: [
+      { label: 'None', value: 0 },
+      { label: 'Wheat', value: 1, css: 'sot-wheat' },
+      { label: 'Iron', value: 2, css: 'sot-iron' },
+  ],
   MAP_STYLE: [
     {
         "featureType": "all",

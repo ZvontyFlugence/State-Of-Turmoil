@@ -25,6 +25,21 @@ const World = props => {
     }
   });
 
+  const getResource = value => {
+    let resource = constants.RESOURCES[value];
+
+    if (resource.css) {
+      return (
+        <span style={{ float: 'right'}}>
+          {resource.label}
+          <i className={resource.css} style={{ marginLeft: '10px', verticalAlign: 'middle' }} />
+        </span>
+      );
+    } else {
+      return <span style={{ float: 'right' }}>{ resource.label }</span>;
+    }
+  }
+
   const loadGoogleMaps = callback => {
     const existingScript = document.getElementById('googleMaps');
   
@@ -59,7 +74,14 @@ const World = props => {
       SoTApi.getMapRegions().then(data => {
         if (data.regions) {    
           setOverlays(data.regions.map(region => {
-            let paths = region.borders.map(path => ({ lat: path.lng, lng: path.lat }));
+            let paths = [];
+            if (!region.type) {
+              paths = region.borders.map(path => ({ lat: path.lng, lng: path.lat }));
+            } else {
+              paths = region.borders.map(geom => {
+                return geom.map(path => ({ lat: path.lng, lng: path.lat }));
+              });
+            }
             let polygon = new google.maps.Polygon({ paths, strokeWeight: 1, fillColor: region.owner.color, fillOpacity: 0.9 });
             polygon.addListener('click', () => history.push(`/region/${region._id}`));
             polygon.addListener('mouseover', () => {
@@ -73,7 +95,7 @@ const World = props => {
                     <span className='p-col-12' style={{ padding: '0.5em 0px' }}>
                       Core: <i className={`flag-icon flag-icon-${region.owner.flag_code}`} style={{ boxShadow: 'none' }} />
                     </span>
-                    <p className='p-col-12'>Resource: { region.resource }</p>
+                    <p className='p-col-12'>Resource: { getResource(region.resource) }</p>
                   </div>
                 ),
                 sticky: true,
