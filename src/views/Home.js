@@ -9,6 +9,7 @@ import { Fieldset } from 'primereact/fieldset';
 
 // Components
 import Private from './layouts/private';
+import { Message } from 'primereact/message';
 
 const Home = props => {
 
@@ -30,6 +31,9 @@ const Home = props => {
             <div className='p-grid'>
               <div className='p-col-3' style={{ textAlign: 'center' }}>
                 <Fieldset legend='Gym'>
+                  { props.user && props.user.canTrain > new Date(Date.now()) && (
+                    <Message severity='warn' text='Must wait until tomorrow' />
+                  )}
                   <p>Current Strength: { props.user && props.user.strength } <i className='sot-strength' /></p>
                   <Button label='Train' onClick={handleTraining} disabled={props.user && props.user.canTrain > new Date(Date.now())} />
                 </Fieldset>

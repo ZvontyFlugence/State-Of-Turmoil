@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { connect } from 'react-redux';
 import moment from 'moment';
 import SoTApi from 'services/SoTApi';
 
@@ -10,10 +11,20 @@ import { TabView, TabPanel } from 'primereact/tabview';
 const Shouts = props => {
   const [shout, setShout] = useState('');
   const [shouts, setShouts] = useState([]);
+  const [regionInfo, setRegionInfo] = useState(null);
   const [reload, setReload] = useState(true);
   const [active, setActive] = useState(0);
 
   useEffect(() => {
+    if (!regionInfo) {
+      SoTApi.getLocationInfo().then(data => {
+        if (!data.error) {
+          console.log('REGION DATE:', data);
+          setRegionInfo(data.region_info);
+        }
+      });
+    }
+
     if (reload) {
       let scope = undefined;
       let country, party, unit = undefined;
@@ -23,15 +34,15 @@ const Shouts = props => {
           scope = 'global';
           break;
         case 1:
-          country = props.regionOwner;
+          country = regionInfo.owner._id;
           scope = 'country';
           break;
         case 2:
-          party = props.party;
+          party = props.user && props.user.party;
           scope = 'party';
           break;
         case 3:
-          party = props.unit;
+          unit = props.user && props.user.unit;
           scope = 'unit';
           break;
         default:
@@ -62,15 +73,15 @@ const Shouts = props => {
     switch (active) {
       case 1:
         scope = 'country';
-        country = props.country;
+        country = props.user && regionInfo.owner._id;
         break;
       case 2:
         scope = 'party';
-        party = props.party;
+        party = props.user && props.user.party;
         break;
       case 3:
         scope = 'unit';
-        unit = props.unit;
+        unit = props.user && props.user.unit;
         break;
       default:
         break;
@@ -133,16 +144,25 @@ const Shouts = props => {
           <img src={item.user_img} alt="" style={{ width: '100%', margin: '0 auto', borderRadius: '10px' }} />
         </a>
       </div>
-      <div className='p-col'>{item.message}</div>
+      <div className='p-col'>{ item.message }</div>
       <div className='p-col-12'>
         <div className='p-grid'>
           <div className='p-col'>
-            <span>{moment(item.posted).fromNow()}</span>
+            <span>{ moment(item.posted).fromNow() }</span>
           </div>
           <div className='p-col' style={{ textAlign: 'right' }}>
-            <span><i className='pi pi-thumbs-up' /> {item.likes}</span>
+            <span><i className='pi pi-thumbs-up' /> { item.likes }</span>
           </div>
         </div>
+      </div>
+    </div>
+  );
+
+  const shoutsContent = (
+    <div className='p-grid p-dir-col'>
+      { shoutBox }
+      <div className='p-col-12'>
+        { shouts && shouts.length > 0 ? shouts.map((s, idx) => shoutItem(s, idx)) : (<span>No Shouts</span>) }
       </div>
     </div>
   );
@@ -150,18 +170,23 @@ const Shouts = props => {
   return (
     <TabView activeIndex={active} onTabChange={handleTabChange}>
       <TabPanel header='Global'>
-        <div className='p-grid p-dir-col'>
-          {shoutBox}
-          <div className='p-col-12'>
-            {shouts && shouts.length > 0 ? shouts.map((s, idx) => shoutItem(s, idx)) : (<span>No Shouts</span>)}
-          </div>
-        </div>
+        { shoutsContent }
       </TabPanel>
-      <TabPanel header='Country' disabled></TabPanel>
-      <TabPanel header='Party' disabled></TabPanel>
-      <TabPanel header='Unit' disabled></TabPanel>
+      <TabPanel header='Country'>
+        { shoutsContent }
+      </TabPanel>
+      <TabPanel header='Party'> 
+        { shoutsContent }
+      </TabPanel>
+      <TabPanel header='Unit'>
+        { shoutsContent }
+      </TabPanel>
     </TabView>
   );
 }
 
-export default Shouts;
+const mapStateToProps = state => ({
+  user: state.auth.user,
+});
+
+export default connect(mapStateToProps)(Shouts);

@@ -102,7 +102,7 @@ ShoutsService.countryShouts = async countryID => {
     .toArray();
 
   if (shouts_list) {
-    payload = { shouts: shout_list };
+    payload = { shouts: shouts_list };
     return Promise.resolve({ status: 200, payload });
   }
   payload = { error: 'Country Shouts Not Found' };
@@ -119,7 +119,7 @@ ShoutsService.partyShouts = async partyID => {
     .toArray();
 
   if (shouts_list) {
-    payload = { shouts: shout_list };
+    payload = { shouts: shouts_list };
     return Promise.resolve({ status: 200, payload });
   }
   payload = { error: 'Party Shouts Not Found' };
@@ -136,7 +136,7 @@ ShoutsService.unitShouts = async unitID => {
     .toArray();
 
   if (shouts_list) {
-    payload = { shouts: shout_list };
+    payload = { shouts: shouts_list };
     return Promise.resolve({ status: 200, payload });
   }
   payload = { error: 'Military Unit Shouts Not Found' };

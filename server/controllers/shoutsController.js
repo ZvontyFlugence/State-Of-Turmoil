@@ -8,8 +8,10 @@ router.post('/', auth, async (req, res) => {
   let result = { status: 500, payload: { error: 'Something Went Wrong' } };
   switch (req.body.scope) {
     case 'country':
-      const countryID = req.body.country;
-      result = await ShoutsService.countryShouts(countryID);
+      if (req.body.country) {
+        const countryID = req.body.country;
+        result = await ShoutsService.countryShouts(countryID);
+      }
       break;
     case 'party':
       const partyID = req.body.party;
