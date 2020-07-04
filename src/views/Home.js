@@ -13,7 +13,7 @@ import Private from './layouts/private';
 const Home = props => {
 
   const handleTraining = () => {
-    SoTApi.doAction({ action: 'TRAIN' }).then(data => {
+    SoTApi.doAction({ action: 'train' }).then(data => {
       if (data.success) {
         props.growl.show({ severity: 'success', summary: 'Training Complete' });
         props.loadUser();
@@ -31,7 +31,7 @@ const Home = props => {
               <div className='p-col-3' style={{ textAlign: 'center' }}>
                 <Fieldset legend='Gym'>
                   <p>Current Strength: { props.user && props.user.strength } <i className='sot-strength' /></p>
-                  <Button label='Train' onClick={handleTraining} />
+                  <Button label='Train' onClick={handleTraining} disabled={props.user && props.user.canTrain > new Date(Date.now())} />
                 </Fieldset>
               </div>
               <div className='p-col'>

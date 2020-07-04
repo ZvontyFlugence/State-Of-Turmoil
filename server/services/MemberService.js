@@ -116,6 +116,12 @@ const train = async id => {
   const user = await MemberService.getUser(id);
   const users = db.getDB().collection('users');
 
+  if (user.canTrain > new Date(Date.now())) {
+    console.log('SUCCESSFULLY DISABLED!');
+    const payload = { success: false, error: 'You cannot train yet' };
+    return Promise.reject({ status: 400, payload });
+  }
+
   if (user.health < 10) {
     const payload = { success: false, error: 'Insufficient Health!' };
     return Promise.reject({ status: 400, payload });
@@ -125,8 +131,10 @@ const train = async id => {
     strength: user.strength + 1,
     xp: user.xp + 1,
     health: user.health - 10,
+    canTrain: new Date().setHours(24, 0, 0, 0),
   };
 
+  // TODO: Create alert for level ups
   if (updates.xp >= neededXP(user.level)) {
     updates.level = user.level + 1;
     updates.gold = user.gold + 1.0;

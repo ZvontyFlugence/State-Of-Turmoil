@@ -68,7 +68,10 @@ router.patch('/action', auth, async (req, res) => {
     return res.status(400).json({ error: 'No Action Provided' });
   }
 
-  let result = await MemberService.doAction(req.user_id, req.body);
+  let result = await MemberService.doAction(req.user_id, req.body)
+    .catch(err => {
+      return err;
+    });
   return res.status(result.status).json(result.payload);
 });
 
