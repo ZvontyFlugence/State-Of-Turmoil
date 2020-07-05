@@ -13,6 +13,8 @@ import { Message } from 'primereact/message';
 
 const Home = props => {
 
+  const hasTrained = () => props.user && new Date(props.user.canTrain) > new Date(Date.now());
+
   const handleTraining = () => {
     SoTApi.doAction({ action: 'train' }).then(data => {
       if (data.success) {
@@ -31,7 +33,7 @@ const Home = props => {
             <div className='p-grid'>
               <div className='p-col-3' style={{ textAlign: 'center' }}>
                 <Fieldset legend='Gym'>
-                  { props.user && props.user.canTrain > new Date(Date.now()) && (
+                  { hasTrained() && (
                     <Message severity='warn' text='Must wait until tomorrow' />
                   )}
                   <p>Current Strength: { props.user && props.user.strength } <i className='sot-strength' /></p>

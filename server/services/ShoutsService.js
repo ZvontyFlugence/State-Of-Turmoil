@@ -4,13 +4,13 @@ const ShoutsService = {};
 
 ShoutsService.sendShout = async data => {
   const shouts = db.getDB().collection('shouts');
+  let payload = {};
 
   let shout_obj = {
     user: data.user_id,
     scope: data.scope,
     message: data.message,
     replies: [],
-    likes: 0,
     posted: new Date(Date.now()),
   };
 
@@ -18,8 +18,18 @@ ShoutsService.sendShout = async data => {
     case 'country':
       shout_obj[data.scope] = data.country_id;
     case 'party':
+      if (!data.party_id || data.party_id === 0) {
+        payload = { success: false, error: 'Invalid Party Id' };
+        return Promise.reject({ status: 400, payload })
+      }
+
       shout_obj[data.scope] = data.party_id;
     case 'unit':
+      if (!data.unit_id || data.unit_id === 0) {
+        payload = { success: false, error: 'Invalid Unit Id' };
+        return Promise.reject({ status: 400, payload })
+      }
+
       shout_obj[data.scope] = data.unit_id;
     default:
       break;
@@ -30,7 +40,7 @@ ShoutsService.sendShout = async data => {
   if (result.ops[0]) {
     return Promise.resolve({ status: 201, payload: { success: true } });
   }
-  const payload = { error: 'Something Unexpected Happened' };
+  payload = { error: 'Something Unexpected Happened' };
   return Promise.reject({ status: 500, payload });
 }
 
@@ -44,7 +54,6 @@ ShoutsService.sendReply = async data => {
       reply_id: shout.replies.length,
       user: data.user_id,
       message: data.message,
-      likes: 0,
       posted: new Date(Date.now()),
     };
 

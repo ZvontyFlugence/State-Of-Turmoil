@@ -46,6 +46,8 @@ MemberService.createUser = async data => {
     newspaper: 0,
     canTrain: new Date(Date.now()),
     canWork: new Date(Date.now()),
+    canCollectRewards: new Date(Date.now()),
+    canHeal: new Date(Date.now()),
     wallet: [{ currency: country.currency, amount: 25.00 }],
     inventory: [],
     alerts: [],
@@ -117,7 +119,6 @@ const train = async id => {
   const users = db.getDB().collection('users');
 
   if (user.canTrain > new Date(Date.now())) {
-    console.log('SUCCESSFULLY DISABLED!');
     const payload = { success: false, error: 'You cannot train yet' };
     return Promise.reject({ status: 400, payload });
   }
@@ -131,7 +132,7 @@ const train = async id => {
     strength: user.strength + 1,
     xp: user.xp + 1,
     health: user.health - 10,
-    canTrain: new Date().setHours(24, 0, 0, 0),
+    canTrain: new Date(new Date().setHours(24, 0, 0, 0)),
   };
 
   // TODO: Create alert for level ups
@@ -152,9 +153,15 @@ const train = async id => {
 const heal = async id => {
   const user = await MemberService.getUser(id);
   const users = db.getDB().collection('users');
+  let payload = {};
+
+  if (user.canHeal > new Date(Date.now())) {
+    payload = { success: false, error: 'You\'ve already healed today' };
+    return Promise.reject({ status: 400, payload });
+  }
 
   if (user.health === 100) {
-    const payload = { success: false, error: 'You\'re already at max health!' };
+    payload = { success: false, error: 'You\'re already at max health!' };
     return Promise.reject({ status: 400, payload });
   }
 
@@ -164,7 +171,7 @@ const heal = async id => {
   if (updated_user) {
     return Promise.resolve({ status: 200, payload: { success: true } });
   }
-  const payload = { success: false, error: 'Something Unexpected Happened!' };
+  payload = { success: false, error: 'Something Unexpected Happened!' };
   return Promise.reject({ status: 500, payload });
 }
 

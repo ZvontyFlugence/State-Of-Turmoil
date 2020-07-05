@@ -10,9 +10,9 @@ import { Fieldset } from 'primereact/fieldset';
 const Dailies = props => {
   let history = useHistory();
 
-  const hasTrained = () => props.user && props.user.canTrain > new Date(Date.now());
-  const hasWorked = () => props.user && props.user.canWork > new Date(Date.now());
-  const hasCollectedRewards = () => props.user && props.user.canCollectRewards > new Date(Date.now());
+  const hasTrained = () => props.user && new Date(props.user.canTrain) > new Date(Date.now());
+  const hasWorked = () => props.user && new Date(props.user.canWork) > new Date(Date.now());
+  const hasCollectedRewards = () => props.user && new Date(props.user.canCollectRewards) > new Date(Date.now());
 
   return (
     <Fieldset legend='Dailies'>

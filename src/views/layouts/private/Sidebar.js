@@ -70,6 +70,8 @@ const Sidebar = props => {
     return 0;
   }
 
+  const hasHealed = () => props.user && new Date(props.user.canHeal) > new Date(Date.now());
+
   const handleHeal = () => {
     SoTApi.doAction({ action: 'heal' }).then(data => {
       if (data.success) {
@@ -115,7 +117,7 @@ const Sidebar = props => {
                 <ProgressBar id='healthbar' value={props.user.health} displayValueTemplate={healthBarTemplate} />
                 <ProgressBar id='xpbar' value={getXpPercent()} displayValueTemplate={xpBarTemplate} />
                 <br />
-                  <Button className='p-button-success' label='Heal' onClick={handleHeal} disabled={props.user.health === 100} />
+                  <Button className='p-button-success' label='Heal' onClick={handleHeal} disabled={hasHealed() || props.user.health === 100} />
                 <br />
                 <Fieldset legend='Location'>
                   <p>

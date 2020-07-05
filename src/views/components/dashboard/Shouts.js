@@ -73,7 +73,7 @@ const Shouts = props => {
     switch (active) {
       case 1:
         scope = 'country';
-        country = props.user && regionInfo.owner._id;
+        country = regionInfo.owner._id;
         break;
       case 2:
         scope = 'party';
@@ -136,12 +136,11 @@ const Shouts = props => {
   );
 
   // TODO: Add inline Reply functionality
-  // TODO: Allow users to like a shout and update in DB
   const shoutItem = (item, index) => (
     <div key={index} className='p-grid'>
-      <div className='p-col-2'>
-        <a href={`/profile/${item.user}`}>
-          <img src={item.user_img} alt="" style={{ width: '100%', margin: '0 auto', borderRadius: '10px' }} />
+      <div className='p-col-2' style={{ textAlign: 'center' }}>
+        <a href={`/profile/${item.user}`} style={{ margin: '0 auto' }}>
+          <img src={item.user_img} alt="" style={{ width: '75%', borderRadius: '10px' }} />
         </a>
       </div>
       <div className='p-col'>{ item.message }</div>
@@ -151,7 +150,11 @@ const Shouts = props => {
             <span>{ moment(item.posted).fromNow() }</span>
           </div>
           <div className='p-col' style={{ textAlign: 'right' }}>
-            <span><i className='pi pi-thumbs-up' /> { item.likes }</span>
+            <div className='p-grid p-justify-end'>
+              <div className='p-col'>
+                <span>View Replies</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -167,18 +170,31 @@ const Shouts = props => {
     </div>
   );
 
+  const countryTabHeader = (
+    <>
+      {regionInfo ? (
+        <span>
+          {regionInfo.owner.name }
+          <i className={`flag-icon flag-icon-${regionInfo.owner.flag} flag-inline-right`} />
+        </span>
+      ) : (
+        <span>Country</span>
+      )}
+    </>
+  );
+
   return (
     <TabView activeIndex={active} onTabChange={handleTabChange}>
       <TabPanel header='Global'>
         { shoutsContent }
       </TabPanel>
-      <TabPanel header='Country'>
+      <TabPanel header={countryTabHeader}>
         { shoutsContent }
       </TabPanel>
-      <TabPanel header='Party'> 
+      <TabPanel header='Party' disabled={props.user && props.user.party <= 0}> 
         { shoutsContent }
       </TabPanel>
-      <TabPanel header='Unit'>
+      <TabPanel header='Unit' disabled={props.user && props.user.unit <= 0}>
         { shoutsContent }
       </TabPanel>
     </TabView>
