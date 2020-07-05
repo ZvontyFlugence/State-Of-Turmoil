@@ -7,18 +7,19 @@ import growlActions from 'store/growl/actions';
 import { Growl } from 'primereact/growl';
 
 // Components
+import Alerts from 'views/Alerts';
+import Dashboard from 'views/Dashboard';
+import Home from 'views/Home';
 import Index from 'views/Index';
 import Login from 'views/Login';
+import MyCompanies from 'views/MyCompanies';
 import NotFound from 'views/NotFound';
-import Register from 'views/Register';
-import Dashboard from 'views/Dashboard';
-import World from 'views/World';
-import Home from 'views/Home';
-import Settings from 'views/Settings';
 import Profile from 'views/Profile';
-import Alerts from 'views/Alerts';
 import Rankings from 'views/Rankings';
 import Region from 'views/Region';
+import Register from 'views/Register';
+import Settings from 'views/Settings';
+import World from 'views/World';
 
 function App(props) {
   return (
@@ -26,18 +27,22 @@ function App(props) {
       <Growl ref={props.setGrowl} />
       <Switch>
         <Route exact path='/' component={Index} />
-        <Route path='/login' component={Login} />
-        <Route path='/register' component={Register} />
-        <Route path='/dashboard' component={Dashboard} />
         <Route path='/alerts' component={Alerts} />
-        <Route path='/profile/:id' component={Profile} /> 
-        <Route path='/settings' component={Settings} />
+        <Route path='/companies' component={MyCompanies} />
+        <Route path='/dashboard' component={Dashboard} />
         <Route path='/home' component={Home} />
+        <Route path='/login' component={Login} />
+        <Route path='/profile/:id' component={Profile} /> 
+        <Route path='/profile'>
+          <Redirect to={`/profile/${props.user && props.user._id}`} />
+        </Route>
         <Route path='/rankings' component={Rankings} />
         <Route path='/region/:id' component={Region} />
         <Route path='/region'>
           <Redirect to={`/region/${props.user && props.user.location}`} />
         </Route>
+        <Route path='/register' component={Register} />
+        <Route path='/settings' component={Settings} />
         <Route path='/world' component={World} />
         <Route path='*' component={NotFound} />
       </Switch>
