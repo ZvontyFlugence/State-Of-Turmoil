@@ -1,6 +1,7 @@
 const express = require('express');
 const auth = require('../middleware/auth');
 const MemberService = require('../services/MemberService');
+const CompService = require('../services/CompService');
 const CountryService = require('../services/CountryService');
 const RegionService = require('../services/RegionService');
 const router = express.Router();
@@ -73,6 +74,15 @@ router.patch('/action', auth, async (req, res) => {
       return err;
     });
   return res.status(result.status).json(result.payload);
+});
+
+router.get('companies', auth, async (req, res) => {
+  let companies = await CompService.getUserCompanies(req.user_id);
+
+  if (companies) {
+    return res.status(200).json({ companies });
+  }
+  return res.status(404).json({ error: 'No User Companies Found' });
 });
 
 router.get('/:id', auth, async (req, res) => {

@@ -1,40 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { connect } from 'react-redux';
 
 // PrimeReact
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
-import { DataView } from 'primereact/dataview';
 
 // Components
+import CompaniesList from './components/companies/CompaniesList';
+import CreateCompany from './components/companies/CreateCompany';
 import Private from './layouts/private';
 
 const MyCompanies = props => {
-
-  const renderHeader = () => (
-    <div className='p-grid' style={{ margin: '0px' }}>
-      <div className='p-col' style={{ padding: '0px', margin: '0px' }}>
-        <span>Company</span>
-      </div>
-      <div className='p-col' style={{ padding: '0px', margin: '0px' }}>
-        <span>Type</span>
-      </div>
-      <div className='p-col' style={{ padding: '0px', margin: '0px' }}>
-        <span></span>
-      </div>
-    </div>
-  );
-
-  const companyTemplate = comp => (
-    <div className='p-grid'>
-      <div className='p-col'>
-        { comp.name }
-      </div>
-      <div className='p-col'>
-        { comp.type }
-      </div>
-    </div>
-  );
+  const [showModal, setShowModal] = useState(false);
 
   return (
     <Private>
@@ -42,24 +19,18 @@ const MyCompanies = props => {
         <h1>My Companies</h1>
         <div className='p-grid'>
           <div className='p-col-10 p-offset-1' style={{ textAlign: 'right' }}>
-            <Button label='Create Company' />
+            <Button label='Create Company' onClick={() => setShowModal(true)} />
           </div>
           <div className='p-col-10 p-offset-1'>
             {props.user && props.user.companies.length > 0 ? (
-              <DataView
-                value={props.user.companies}
-                header={renderHeader()}
-                itemTemplate={companyTemplate}
-                rows={Math.min(props.user.companies.length, 10)}
-                paginatorPosition='bottom'
-                paginator
-              />
+              <CompaniesList companies={props.user.companies} />
             ) : (
               <Card>You don't own any Companies</Card>
             )}
           </div>
         </div>
       </div>
+      <CreateCompany show={showModal} hide={() => setShowModal(false)} gold={(props.user && props.user.gold) || 0} />
     </Private>
   );
 }

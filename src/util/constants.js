@@ -37,6 +37,12 @@ const constants = {
       { label: 'Wheat', value: 1, css: 'sot-wheat' },
       { label: 'Iron', value: 2, css: 'sot-iron' },
   ],
+  COMPANY_TYPES: [
+    { label: 'None', value: 0, disabled: true },
+    { label: 'Wheat', value: 1, css: 'sot-wheat' },
+    { label: 'Iron', value: 2, css: 'sot-iron' },
+    { label: 'Bread', value: 3, css: 'sot-bread' },
+  ],
   MAP_STYLE: [
     {
         "featureType": "all",
