@@ -29,6 +29,9 @@ SoTApi.getLocationInfo = () => client.get('/user/location-info');
 SoTApi.getWalletInfo = () => client.get('/user/wallet-info');
 SoTApi.doAction = payload => client.patch('/user/action', payload);
 
+// Company
+SoTApi.getCompany = id => client.get(`/companies/${id}`);
+
 // Regions
 SoTApi.getRegion = id => client.get(`/regions/${id}`);
 
@@ -36,9 +39,8 @@ SoTApi.getRegion = id => client.get(`/regions/${id}`);
 SoTApi.getShouts = payload => client.post('/shouts', payload);
 
 // Stats
-// TODO: Change from PATCH to POST requests
-SoTApi.getCitizenStats = payload => client.patch('/stats/citizens', payload);
-SoTApi.getCountryStats = payload => client.patch('/stats/countries', payload);
+SoTApi.getCitizenStats = payload => client.post('/stats/citizens', payload);
+SoTApi.getCountryStats = payload => client.post('/stats/countries', payload);
 
 // Map
 SoTApi.getMapRegions = () => client.get('/map/regions');

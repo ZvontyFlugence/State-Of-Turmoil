@@ -169,7 +169,8 @@ const heal = async id => {
     return Promise.reject({ status: 400, payload });
   }
 
-  let updates = { health: Math.min(user.health + 50, 100) };
+  const canHeal = new Date(new Date().setHours(24, 0, 0, 0));
+  let updates = { health: Math.min(user.health + 50, 100), canHeal };
   const updated_user = await users.findOneAndUpdate({ _id: user._id }, { $set: updates }, { new: true });
 
   if (updated_user) {
@@ -306,7 +307,7 @@ const create_company = async (id, data) => {
     if (res) {
       return Promise.resolve(result);
     }
-    return Promise.reject({ status: 500, payload: { success: false, error: 'Something Unexpected Happed' } });
+    return Promise.reject({ status: 500, payload: { success: false, error: 'Something Unexpected Happened' } });
   }
   return Promise.reject(result);
 }

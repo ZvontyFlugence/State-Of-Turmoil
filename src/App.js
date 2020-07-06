@@ -8,6 +8,7 @@ import { Growl } from 'primereact/growl';
 
 // Components
 import Alerts from 'views/Alerts';
+import Company from 'views/Company';
 import Dashboard from 'views/Dashboard';
 import Home from 'views/Home';
 import Index from 'views/Index';
@@ -29,6 +30,7 @@ function App(props) {
         <Route exact path='/' component={Index} />
         <Route path='/alerts' component={Alerts} />
         <Route path='/companies' component={MyCompanies} />
+        <Route path='/company/:id' component={Company} />
         <Route path='/dashboard' component={Dashboard} />
         <Route path='/home' component={Home} />
         <Route path='/login' component={Login} />
