@@ -25,6 +25,7 @@ router.get('/:id', auth, async (req, res) => {
 });
 
 // Creates a new region
+// DEVELOPMENT ONLY
 router.post('/', async (req, res) => {
   let region = await RegionService.createRegion(req.body);
 
@@ -33,5 +34,20 @@ router.post('/', async (req, res) => {
   }
   return res.status(500).json({ success: false });
 });
+
+// UPDATES REGIONS NEIGHBORS
+// DEVELOPMENT ONLY
+router.post('/neighbors', async (req, res) => {
+  let result = await RegionService.updateNeighbors(req.body);
+  return res.status(result.status).json(result.payload);
+});
+
+router.post('/travel-path', async (req, res) => {
+  let { src, dest } = req.body;
+  let result = await RegionService.getDistance(src - 1, dest - 1);
+  const distance = result.path.length - 1;
+  const cost = Number.parseFloat(Math.log10(distance).toFixed(2));
+  return res.status(200).json({ from: src, to: dest, distance, cost })
+})
 
 module.exports = router;
