@@ -73,7 +73,8 @@ router.patch('/action', auth, async (req, res) => {
     .catch(err => {
       return err;
     });
-  return res.status(result.status).json(result.payload);
+  
+  return res.status(200).json(result.payload);
 });
 
 router.get('companies', auth, async (req, res) => {

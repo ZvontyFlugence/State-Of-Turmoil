@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
+import SoTApi from 'services/SoTApi';
 
 // PrimeReact
 import { Button } from 'primereact/button';
@@ -12,6 +13,21 @@ import Private from './layouts/private';
 
 const MyCompanies = props => {
   const [showModal, setShowModal] = useState(false);
+  const [companies, setCompanies] = useState([]);
+  const [reload, setReload] = useState(true);
+
+  useEffect(() => {
+    if (props.user && reload) {
+      // TODO: Get Companies with matching CEO
+      SoTApi.getCompanies(props.user._id)
+        .then(data => {
+          if (data.companies) {
+            setCompanies(data.companies);
+          }
+        });
+      setReload(false);
+    }
+  }, [props.user, reload]);
 
   return (
     <Private>
@@ -22,8 +38,8 @@ const MyCompanies = props => {
             <Button label='Create Company' onClick={() => setShowModal(true)} />
           </div>
           <div className='p-col-10 p-offset-1'>
-            {props.user && props.user.companies.length > 0 ? (
-              <CompaniesList companies={props.user.companies} />
+            {companies.length > 0 ? (
+              <CompaniesList companies={companies} />
             ) : (
               <Card>You don't own any Companies</Card>
             )}

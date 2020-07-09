@@ -6,7 +6,7 @@ CompService.createCompany = async data => {
   let companies = db.getDB().collection('companies');
 
   let comp_doc = {
-    _id: companies.estimatedDocumentCount() + 1,
+    _id: await companies.estimatedDocumentCount() + 1,
     name: data.name,
     image: process.env.DEFAULT_COMP_PIC,
     type: data.type,

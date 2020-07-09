@@ -23,6 +23,7 @@ const CreateCompany = props => {
         if (data.success) {
           history.push(`/company/${data.comp_id}`);
         }
+        console.log('DATA:', data);
       });
   }
 
@@ -41,7 +42,7 @@ const CreateCompany = props => {
   return (
     <Dialog header='Create Company' visible={props.show} onHide={props.hide} style={{ width: '25vw' }} modal>
       <div className='p-grid p-dir-col p-fluid'>
-        <div class='p-col'>
+        <div className='p-col'>
           <span className='p-float-label'>
             <InputText id='name' value={name} onChange={e => setName(e.target.value)} />
             <label htmlFor='name'>Company Name</label>

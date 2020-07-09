@@ -302,16 +302,22 @@ const create_company = async (id, data) => {
   data.ceo = id;
   data.location = user.location;
 
-  let result = await CompService.createCompany();
+  let result = await CompService.createCompany(data)
+    .catch(err => err);
+
+  console.log('RESULT:', result);
 
   if (result && result.payload.success) {
-    let res = await users.findOneAndUpdate({ _id: id }, { $inc: { gold: -25 } }, { new: true });
+    const gold = user.gold - 25;
+    let res = await users.findOneAndUpdate({ _id: id }, { $set: { gold } }, { new: true });
     
     if (res) {
+      console.log('RESULT SUCCESS:', result);
       return Promise.resolve(result);
     }
     return Promise.reject({ status: 500, payload: { success: false, error: 'Something Unexpected Happened' } });
   }
+  console.log('RESULT FAIL:', result);
   return Promise.reject(result);
 }
 
