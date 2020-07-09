@@ -34,6 +34,7 @@ SoTApi.getCompany = id => client.get(`/companies/${id}`);
 
 // Regions
 SoTApi.getRegion = id => client.get(`/regions/${id}`);
+SoTApi.getTravelDistance = payload => client.post('/regions/travel-distance', payload);
 
 // Shouts
 SoTApi.getShouts = payload => client.post('/shouts', payload);
