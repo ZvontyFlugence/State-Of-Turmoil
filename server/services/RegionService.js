@@ -77,7 +77,7 @@ RegionService.getDistance = async (src, dest) => {
   let nodes = createNodes(regions);
   let _visited = dijkstras(nodes, nodes[src], nodes[dest]);
   let shortestPath = getShortestPath(nodes[dest]);
-  return Promise.resolve({ path: shortestPath });
+  return Promise.resolve({ from: regions[src], to: regions[dest], path: shortestPath });
 }
 
 const createNodes = (regions) => {
@@ -94,22 +94,35 @@ const dijkstras = (nodes, srcNode, destNode) => {
   let visited = [];
   srcNode.distance = 0;
   let unvisited = getAllNodes(nodes);
+  let shortestDistance = Infinity;
 
   while (!!unvisited.length) {
     sortNodesByDistance(unvisited);
     let closest = getClosestNode(unvisited, destNode);
-
+    
     if (closest.distance === Infinity)
       return visited;
+    else if (closest.distance > shortestDistance)
+      continue;
+    else if (closest.distance === shortestDistance && closest._id === destNode._id)
+      return visited;
+
+    if (closest.neighbors.includes(destNode._id)) {
+      destNode.distance = closest.distance + 1;
+      destNode.previous = closest;
+      shortestDistance = destNode.distance;
+    }
 
     closest.visited = true;
     visited.push(closest);
 
     if (closest._id === destNode._id)
-      return visited;
+      shortestDistance = closest.distance;
 
-    updateUnvisitedNeighbors(closest, nodes);
+    updateNeighbors(closest, nodes, unvisited);
   }
+
+  return visited;
 }
 
 const getAllNodes = nodes => {
@@ -135,21 +148,28 @@ const getClosestNode = (nodes, destNode) => {
     return nodes.shift();
 }
 
-const updateUnvisitedNeighbors = (node, nodes) => {
-  let unvisitedNeighbors = getUnvisitedNeighbors(node, nodes);
+const updateNeighbors = (node, nodes, unvisited) => {
+  let neighbors = getNeighborNodes(node, nodes, unvisited);
 
-  for (let neighbor of unvisitedNeighbors) {
-    neighbor.distance = node.distance + 1;
-    neighbor.previous = node;
+  for (let neighbor of neighbors) {
+    if (neighbor.distance > node.distance + 1) {
+      neighbor.distance = node.distance + 1;
+      neighbor.previous = node;
+    }    
   }
 }
 
-const getUnvisitedNeighbors = (node, nodes) => {
+const getNeighborNodes = (node, nodes, unvisited) => {
   let neighbors = [];
 
   for (let neighbor of node.neighbors) {
     if (nodes[neighbor-1]) {
-      neighbors.push(nodes[neighbor-1]);
+      let neighborNode = nodes[neighbor-1];
+      if (neighborNode.visited && neighborNode.distance > node.distance + 1) {
+        neighborNode.visited = false;
+        unvisited.push(neighborNode);
+      }
+      neighbors.push(neighborNode);
     }
   }
 

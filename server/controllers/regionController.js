@@ -42,12 +42,21 @@ router.post('/neighbors', async (req, res) => {
   return res.status(result.status).json(result.payload);
 });
 
-router.post('/travel-path', async (req, res) => {
-  let { src, dest } = req.body;
+router.post('/travel-distance', async (req, res) => {
+  if (!req.body.hasOwnProperty('src') || !req.body.hasOwnProperty('dest')) {
+    return res.status(400).json({ error: 'Invalid Travel Information' });
+  }
+
+  let {src, dest} = req.body;
+
+  if (src === dest) {
+    return res.status(400).json({ error: 'Already Located In Target Region' });
+  }
+
   let result = await RegionService.getDistance(src - 1, dest - 1);
   const distance = result.path.length - 1;
   const cost = Number.parseFloat(Math.log10(distance).toFixed(2));
-  return res.status(200).json({ from: src, to: dest, distance, cost })
+  return res.status(200).json({ ...result, distance, cost });
 })
 
 module.exports = router;
