@@ -54,9 +54,10 @@ router.post('/travel-distance', async (req, res) => {
   }
 
   let result = await RegionService.getDistance(src - 1, dest - 1);
-  const distance = result.path.length - 1;
-  const cost = Number.parseFloat(Math.log10(distance).toFixed(2));
-  return res.status(200).json({ ...result, distance, cost });
+  if (result) {
+    return res.status(200).json({ ...result });
+  }
+  return res.status(500).json({ error: 'Something Went Wrong' });
 })
 
 module.exports = router;

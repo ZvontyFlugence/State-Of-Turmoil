@@ -77,7 +77,17 @@ RegionService.getDistance = async (src, dest) => {
   let nodes = createNodes(regions);
   let _visited = dijkstras(nodes, nodes[src], nodes[dest]);
   let shortestPath = getShortestPath(nodes[dest]);
-  return Promise.resolve({ from: regions[src], to: regions[dest], path: shortestPath });
+
+  const distance = shortestPath.length - 1;
+  const cost = Number.parseFloat(Math.log10(distance).toFixed(2));
+
+  return Promise.resolve({
+    from: regions[src],
+    to: regions[dest],
+    path: shortestPath,
+    distance,
+    cost,
+  });
 }
 
 const createNodes = (regions) => {
