@@ -1,10 +1,12 @@
 const db = require('../db');
+const CompService = require('./CompService');
 const CountryService = require('./CountryService');
 const RegionService = require('./RegionService');
 const ShoutsService = require('./ShoutsService');
 
 const MemberService = {};
 const MemberActions = {
+  CREATE_COMPANY: 'CREATE_COMPANY',
   DELETE_ALERT: 'DELETE_ALERT',
   HEAL: 'HEAL',
   READ_ALERT: 'READ_ALERT',
@@ -30,7 +32,7 @@ MemberService.createUser = async data => {
   const user_doc = {
     _id: num_users + 1,
     account: data.email,
-    image: process.env.DEFAULT_PIC,
+    image: process.env.DEFAULT_USER_PIC,
     createdOn: new Date(Date.now()),
     displayName: data.displayName,
     description: '',
@@ -89,6 +91,8 @@ MemberService.getAllUsers = async () => {
 
 MemberService.doAction = async (id, body) => {
   switch (body.action.toUpperCase()) {
+    case MemberActions.CREATE_COMPANY:
+      return await create_company(id, body.comp);
     case MemberActions.DELETE_ALERT:
       return await delete_alert(id, body.alert);
     case MemberActions.HEAL:
@@ -168,7 +172,8 @@ const heal = async id => {
     return Promise.reject({ status: 400, payload });
   }
 
-  let updates = { health: Math.min(user.health + 50, 100) };
+  const canHeal = new Date(new Date().setHours(24, 0, 0, 0));
+  let updates = { health: Math.min(user.health + 50, 100), canHeal };
   const updated_user = await users.findOneAndUpdate({ _id: user._id }, { $set: updates }, { new: true });
 
   if (updated_user) {
@@ -280,6 +285,40 @@ const shout = async (id, data) => {
 const reply_to_shout = async (id, data) => {
   data.user_id = id;
   return ShoutsService.sendReply(data);
+}
+
+const create_company = async (id, data) => {
+  const users = db.getDB().collection('users');
+  let user = await MemberService.getUser(id);
+
+  if (user.gold < 25) {
+    return Promise.reject({ status: 400, payload: { success: false, error: 'Insufficient Funds' } });
+  }
+
+  if (data.type === 0) {
+    return Promise.reject({ status: 400, payload: { success: false, error: 'Invalid Company Type' } });
+  }
+
+  data.ceo = id;
+  data.location = user.location;
+
+  let result = await CompService.createCompany(data)
+    .catch(err => err);
+
+  console.log('RESULT:', result);
+
+  if (result && result.payload.success) {
+    const gold = user.gold - 25;
+    let res = await users.findOneAndUpdate({ _id: id }, { $set: { gold } }, { new: true });
+    
+    if (res) {
+      console.log('RESULT SUCCESS:', result);
+      return Promise.resolve(result);
+    }
+    return Promise.reject({ status: 500, payload: { success: false, error: 'Something Unexpected Happened' } });
+  }
+  console.log('RESULT FAIL:', result);
+  return Promise.reject(result);
 }
 
 const travel = async (id, data) => {

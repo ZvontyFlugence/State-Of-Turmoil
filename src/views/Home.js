@@ -37,7 +37,7 @@ const Home = props => {
                     <Message severity='warn' text='Must wait until tomorrow' />
                   )}
                   <p>Current Strength: { props.user && props.user.strength } <i className='sot-strength' /></p>
-                  <Button label='Train' onClick={handleTraining} disabled={props.user && props.user.canTrain > new Date(Date.now())} />
+                  <Button label='Train' onClick={handleTraining} disabled={props.user && new Date(props.user.canTrain) > new Date(Date.now())} />
                 </Fieldset>
               </div>
               <div className='p-col'>

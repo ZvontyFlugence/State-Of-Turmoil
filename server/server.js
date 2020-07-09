@@ -22,6 +22,7 @@ db.connect(err => {
 // TODO: Set up node-cron to begin scheduling elections
 
 const authController = require('./controllers/authController');
+const compController = require('./controllers/compController');
 const mapController = require('./controllers/mapController');
 const regionController = require('./controllers/regionController');
 const shoutsController = require('./controllers/shoutsController');
@@ -33,6 +34,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/auth', authController);
+app.use('/companies', compController);
 app.use('/map', mapController);
 app.use('/regions', regionController);
 app.use('/shouts', shoutsController);

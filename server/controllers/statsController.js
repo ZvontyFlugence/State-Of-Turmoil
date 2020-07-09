@@ -3,7 +3,7 @@ const auth = require('../middleware/auth');
 const StatsService = require('../services/StatsService');
 const router = express.Router();
 
-router.patch('/citizens', auth, async (req, res) => {
+router.post('/citizens', auth, async (req, res) => {
   if (!req.body.hasOwnProperty('stat')) {
     return res.status(400).json({ error: 'No Sorting Stat Provided' });
   }
@@ -12,7 +12,7 @@ router.patch('/citizens', auth, async (req, res) => {
   return res.status(result.status).json(result.payload);
 });
 
-router.patch('/countries', async (req, res) => {
+router.post('/countries', async (req, res) => {
   if (!req.body.hasOwnProperty('stat')) {
     return res.status(400).json({ error: 'No Sorting Stat Provided' });
   }
