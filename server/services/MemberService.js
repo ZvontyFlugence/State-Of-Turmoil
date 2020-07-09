@@ -12,6 +12,7 @@ const MemberActions = {
   SHOUT: 'SHOUT',
   SHOUT_REPLY: 'SHOUT_REPLY',
   TRAIN: 'TRAIN',
+  TRAVEL: 'TRAVEL',
   UPDATE_DESC: 'UPDATE_DESC',
   UPLOAD: 'UPLOAD',
 };
@@ -96,6 +97,8 @@ MemberService.doAction = async (id, body) => {
       return await read_alert(id, body.alert);
     case MemberActions.TRAIN:
       return await train(id);
+    case MemberActions.TRAVEL:
+      return await travel(id, body.travelInfo);
     case MemberActions.SEND_FRIEND_REQUEST:
       return await send_friend_request(id, body.friend_id);
     case MemberActions.SHOUT:
@@ -277,6 +280,33 @@ const shout = async (id, data) => {
 const reply_to_shout = async (id, data) => {
   data.user_id = id;
   return ShoutsService.sendReply(data);
+}
+
+const travel = async (id, data) => {
+  const users = db.getDB().collection('users');
+  let user = await MemberService.getUser(id);
+  if (user) {
+    if (user.location === data.dest) {
+      return Promise.reject({ status: 400, payload: { success: false, error: 'Already Located In Region' } });
+    }
+
+    let travelInfo = await RegionService.getDistance(user.location, data.dest);
+
+    if (travelInfo) {
+      if (user.gold < travelInfo.cost) {
+        return Promise.reject({ status: 400, payload: { success: false, error: 'Insufficient Funds' } });
+      }
+
+      const location = data.dest;
+      const gold = user.gold - travelInfo.cost;
+      let updated = await users.findOneAndUpdate({ _id: id }, { $set: { location, gold }}, { new: true });
+
+      if (updated)
+        return Promise.resolve({ status: 200, payload: { success: true } });
+    }
+    return Promise.reject({ status: 500, payload: { success: false, error: 'Something Went Wrong' } });
+  }
+  return Promise.reject({ status: 404, payload: { success: false, error: 'User Not Found' } });
 }
 
 module.exports = MemberService;

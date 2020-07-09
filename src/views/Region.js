@@ -1,11 +1,14 @@
 /*global google*/
 import React, { useState, useEffect } from 'react';
+import { connect } from 'react-redux';
 import SoTApi from 'services/SoTApi';
 import constants from 'util/constants';
+import authActions from 'store/auth/actions';
 
 // PrimeReact
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
+import { Dialog } from 'primereact/dialog';
 import { GMap } from 'primereact/gmap';
 
 // Components
@@ -13,9 +16,12 @@ import Private from './layouts/private';
 import 'styles/region.css';
 
 const Region = props => {
+  let id = Number.parseInt(props.match.params.id);
   const [region, setRegion] = useState(null);
   const [overlays, setOverlays] = useState([]);
   const [gmapReady, setGMapReady] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [travelInfo, setTravelInfo] = useState(null);
 
   const options = {
     center: {
@@ -30,7 +36,7 @@ const Region = props => {
 
   useEffect(() => {
     if (!region) {
-      SoTApi.getRegion(props.match.params.id).then(data => {
+      SoTApi.getRegion(id).then(data => {
         if (data.region) {
           setRegion(data.region);
         }
@@ -89,6 +95,37 @@ const Region = props => {
     }
   }
 
+  const confirmTravel = () => {
+    let payload = {
+      src: props.user.location,
+      dest: id,
+    };
+
+    SoTApi.getTravelDistance(payload)
+      .then(data => {
+        if (data.distance) {
+          setTravelInfo(data);
+          setShowModal(true);
+        }
+      });
+  }
+
+  const handleTravel = () => {
+    let payload = {
+      action: 'travel',
+      travelInfo: {
+        dest: id
+      },
+    };
+
+    SoTApi.doAction(payload).then(data => {
+      if (data.success) {
+        props.growl.show({ severity: 'success', summary: 'Travel Successful', detail: `You have relocated to ${region.name}` });
+        props.loadUser();
+      }
+    });
+  }
+
   return (
     <Private>
       <div id='region' style={{ paddingLeft: '10vw', paddingRight: '10vw', marginTop: '5vh' }}>
@@ -106,10 +143,11 @@ const Region = props => {
                   <p>Core: { region.core.name } <i className={`flag-icon flag-icon-${region.core.flag} flag-inline-right`} /></p>
                   <p>Resource: { getResource() }</p>
                 </div>
-                <div className='p-col-1' style={{ textAlign: 'right' }}>
-                  {/* TODO: Hide if user is in this region */}
-                  <Button icon='pi pi-ticket' />
-                </div>
+                {props.user && (props.user.location !== id) && (
+                  <div className='p-col-1' style={{ textAlign: 'right' }}>
+                    <Button icon='pi pi-ticket' onClick={confirmTravel} />
+                  </div>
+                )}
               </div>
             </Card>
           </>
@@ -120,9 +158,42 @@ const Region = props => {
           Map Data &copy; 2020 Google, INEGI |
           <a href='https://www.google.com/intl/en-US_US/help/terms_maps/'> Terms of Use</a>
         </span>
+        <Dialog header='Confirm Travel Details' visible={showModal} onHide={() => setShowModal(false)} modal>
+          {travelInfo && (
+            <div className='p-grid p-dir-col p-fluid'>
+              <div className='p-col'>
+                <span>Confirm travel from { travelInfo.from.name } to { travelInfo.to.name }</span>
+              </div>
+              <div className='p-col'>
+                <span>Distance:</span>
+                <span style={{ float: 'right' }}>{ travelInfo.distance }</span>
+              </div>
+              <div className='p-col'>
+                <span>Travel Costs:</span>
+                <span style={{ float: 'right' }}>{ travelInfo.cost.toFixed(2) } <i className='sot-coin' /></span>
+              </div>
+              <div className='p-col'>
+                <span>You Have:</span>
+                <span style={{ float: 'right' }}>{ props.user.gold && props.user.gold.toFixed(2) } <i className='sot-coin' /></span>
+              </div>
+              <div className='p-col'>
+                <Button label='Confirm' onClick={handleTravel} />
+              </div>
+            </div>
+          )}
+        </Dialog>
       </div>
     </Private>
   );
 }
 
-export default Region;
+const mapStateToProps = state => ({
+  growl: state.growl.el,
+  user: state.auth.user,
+});
+
+const mapDispatchToProps = dispatch => ({
+  loadUser: () => dispatch(authActions.loadUser()),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Region);
