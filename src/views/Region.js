@@ -10,6 +10,7 @@ import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { Dialog } from 'primereact/dialog';
 import { GMap } from 'primereact/gmap';
+import { Message } from 'primereact/message';
 
 // Components
 import Private from './layouts/private';
@@ -176,8 +177,11 @@ const Region = props => {
                 <span>You Have:</span>
                 <span style={{ float: 'right' }}>{ props.user.gold && props.user.gold.toFixed(2) } <i className='sot-coin' /></span>
               </div>
+              {props.user.gold < travelInfo.cost && (
+                <Message severity='warning' text='Insufficient Funds' />
+              )}
               <div className='p-col'>
-                <Button label='Confirm' onClick={handleTravel} />
+                <Button label='Confirm' onClick={handleTravel} disabled={props.user.gold < travelInfo.cost} />
               </div>
             </div>
           )}
