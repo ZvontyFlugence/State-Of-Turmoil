@@ -7,6 +7,7 @@ import { ProgressSpinner } from 'primereact/progressspinner';
 
 // Components
 import CompanyHeader from './components/company/CompanyHeader';
+import CompanyInfo from './components/company/CompanyInfo';
 import Private from './layouts/private';
 
 const Company = props => {
@@ -33,9 +34,7 @@ const Company = props => {
               <CompanyHeader user={props.user} company={company} />
             </div>
             <div className='p-col-12'>
-              <div classame='p-grid'>
-                Info Sections Here
-              </div>
+              <CompanyInfo />
             </div>
           </div>
         </div>
