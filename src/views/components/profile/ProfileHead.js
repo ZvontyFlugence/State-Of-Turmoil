@@ -21,6 +21,10 @@ const ProfileHead = props => {
       });
   }
 
+  const removeFriend = () => {
+    // TODO: Implement API Call
+  }
+
   return (
     <Card>
       <div className='p-grid'>
@@ -52,8 +56,12 @@ const ProfileHead = props => {
             {props.user._id !== props.profile._id ? (
               <>
                 <div className='p-col'>
-                  <Button className='side-nav-item' icon='pi pi-user-plus' onClick={sendFriendRequest} />
-                </div>
+                  {props.user.friends.indexOf(props.profile._id) === -1 ? (
+                    <Button className='side-nav-item' icon='pi pi-user-plus' onClick={sendFriendRequest} disabled={props.user.pendingFriends.indexOf(props.profile._id) >= 0} />
+                  ) : (
+                    <Button className='side-nav-item' icon='pi pi-user-minus' onClick={removeFriend} />
+                  )}
+                  </div>
                 <div className='p-col'>
                   <Button className='side-nav-item' icon='pi pi-envelope' />
                 </div>

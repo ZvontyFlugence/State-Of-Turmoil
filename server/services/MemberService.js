@@ -8,6 +8,7 @@ const MemberService = {};
 const MemberActions = {
   CREATE_COMPANY: 'CREATE_COMPANY',
   DELETE_ALERT: 'DELETE_ALERT',
+  FRIEND_REQUEST_RESPONSE: 'FRIEND_REQUEST_RESPONSE',
   HEAL: 'HEAL',
   READ_ALERT: 'READ_ALERT',
   SEND_FRIEND_REQUEST: 'SEND_FRIEND_REQUEST',
@@ -55,7 +56,8 @@ MemberService.createUser = async data => {
     inventory: [],
     alerts: [],
     messages: [],
-    companies: [],
+    pendingFriends: [],
+    friends: [],
   };
 
   const res = await users.insertOne(user_doc);
@@ -95,6 +97,8 @@ MemberService.doAction = async (id, body) => {
       return await create_company(id, body.comp);
     case MemberActions.DELETE_ALERT:
       return await delete_alert(id, body.alert);
+    case MemberActions.FRIEND_REQUEST_RESPONSE:
+      return await friend_request_response(id, body.response_data);
     case MemberActions.HEAL:
       return await heal(id);
     case MemberActions.READ_ALERT:
@@ -213,13 +217,13 @@ const send_friend_request = async (id, friend_id) => {
     timestamp: new Date(Date.now())
   };
 
-  let updates = {
-    alerts: [...friend.alerts, alert],
-  };
+  let alerts = [...friend.alerts, alert];
+  let pendingFriends = [...user.pendingFriends, friend_id];
 
-  let updated_user = await users.findOneAndUpdate({ _id: friend_id }, { $set: updates });
+  let updated_friend = await users.findOneAndUpdate({ _id: friend_id }, { $set: { alerts } });
+  let updated_user = await users.findOneAndUpdate({ _id: id }, { $set: { pendingFriends } });
 
-  if (updated_user) {
+  if (updated_friend && updated_user) {
     return Promise.resolve({ status: 200, payload: { success: true  } });
   }
   return Promise.reject({ status: 500, payload: { success: false, error: 'Something Unexpected Happened!' } });
@@ -305,8 +309,6 @@ const create_company = async (id, data) => {
   let result = await CompService.createCompany(data)
     .catch(err => err);
 
-  console.log('RESULT:', result);
-
   if (result && result.payload.success) {
     const gold = user.gold - 25;
     let res = await users.findOneAndUpdate({ _id: id }, { $set: { gold } }, { new: true });
@@ -346,6 +348,42 @@ const travel = async (id, data) => {
     return Promise.reject({ status: 500, payload: { success: false, error: 'Something Went Wrong' } });
   }
   return Promise.reject({ status: 404, payload: { success: false, error: 'User Not Found' } });
+}
+
+const friend_request_response = async (id, data) => {
+  const users = db.getDB().collection('users');
+  let user = await users.findOne({ _id: id });
+  let friend = await users.findOne({ _id: data.friend_id });
+  let payload, user_updates, friend_updates = {};
+
+  let index = friend.pendingFriends.indexOf(id);
+  if (index >= 0) {
+    friend.pendingFriends.splice(index, 1);
+    user.alerts.splice(data.alert_index, 1);
+  }
+
+  switch (data.response) {
+    case 'accept':
+      user_updates = { alerts: user.alerts, friends: [...user.friends, friend._id] };
+      friend_updates = { pendingFriends: friend.pendingFriends, friends: [...friend.friends, user._id] };
+      break;
+    case 'decline':
+      user_updates = { alerts: user.alerts };
+      friend_updates = { pendingFriends: friend.pendingFriends };
+      break;
+    default:
+      payload = { success: false, error: 'Invalid Response Type' };
+      return Promise.reject({ status: 400, payload });
+  }
+
+  let updated_friend = users.findOneAndUpdate({ _id: friend._id }, { $set: friend_updates });
+  let updated_user = users.findOneAndUpdate({ _id: id }, { $set: user_updates });
+
+  if (updated_friend && updated_user) {
+    return Promise.resolve({ status: 200, payload: { success: true } });
+  }
+  payload = { success: false, error: 'Something Went Wrong' };
+  return Promise.reject({ status: 500, payload });
 }
 
 module.exports = MemberService;
