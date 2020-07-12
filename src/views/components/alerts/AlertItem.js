@@ -5,6 +5,7 @@ import SoTApi from 'services/SoTApi';
 import authActions from 'store/auth/actions';
 
 // PrimeReact
+import { Button } from 'primereact/button';
 import { ContextMenu } from 'primereact/contextmenu';
 
 const AlertItem = props => {
@@ -48,8 +49,8 @@ const AlertItem = props => {
       case 'SEND_FRIEND_REQUEST':
         return (
           <>
-            <i className='pi pi-check' style={{ color: 'green', marginRight: '10px' }} />
-            <i className='pi pi-times' style={{ color: 'red' }} />
+            <Button className='p-button-success' icon='pi pi-check' style={{ marginRight: '10px' }} onClick={acceptFR} />
+            <Button className='p-button-danger' icon='pi pi-times' onClick={declineFR} />
           </>
         );
       default:
@@ -57,15 +58,49 @@ const AlertItem = props => {
     }
   };
 
+  const acceptFR = () => {
+    let payload = {
+      action: 'friend_request_response',
+      response_data: {
+        response: 'accept',
+        alert_index: props.index,
+        friend_id: props.alert.from,
+      }
+    };
+    SoTApi.doAction(payload)
+      .then(data => {
+        if (data.success) {
+          props.loadUser();
+        }
+      });
+  }
+
+  const declineFR = () => {
+    let payload = {
+      action: 'friend_request_response',
+      response_data: {
+        response: 'decline',
+        alert_index: props.index,
+        friend_id: props.alert.from,
+      },
+    };
+    SoTApi.doAction(payload)
+      .then(data => {
+        if (data.success) {
+          props.loadUser();
+        }
+      });
+  }
+
   return (
     <>
       <ContextMenu className='alert-context' model={items} ref={cm} />
       <div className='p-clearfix' onContextMenu={e => cm.current.show(e)}>
         <div className='p-grid p-justify-start' style={{ textAlign: 'left' }}>
-          <div className='p-col-2' style={{ paddingBottom: '0px' }}>
+          <div className='p-col-2 p-col-align-center' style={{ paddingBottom: '0px' }}>
             { getTimestamp() }
           </div>
-          <div className='p-col' style={{ paddingBottom: '0px', fontWeight: props.alert.read ? 'lighter' : 'bold' }}>
+          <div className='p-col p-col-align-center' style={{ paddingBottom: '0px', fontWeight: props.alert.read ? 'lighter' : 'bold' }}>
             { props.alert.message }
           </div>
           <div className='p-col-2' style={{ paddingBottom: '0px', textAlign: 'right' }}>
