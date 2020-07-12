@@ -11,6 +11,7 @@ const MemberActions = {
   FRIEND_REQUEST_RESPONSE: 'FRIEND_REQUEST_RESPONSE',
   HEAL: 'HEAL',
   READ_ALERT: 'READ_ALERT',
+  REMOVE_FRIEND: 'REMOVE_FRIEND',
   SEND_FRIEND_REQUEST: 'SEND_FRIEND_REQUEST',
   SHOUT: 'SHOUT',
   SHOUT_REPLY: 'SHOUT_REPLY',
@@ -103,6 +104,8 @@ MemberService.doAction = async (id, body) => {
       return await heal(id);
     case MemberActions.READ_ALERT:
       return await read_alert(id, body.alert);
+    case MemberActions.REMOVE_FRIEND:
+      return await remove_friend(id, body.friend_id);
     case MemberActions.TRAIN:
       return await train(id);
     case MemberActions.TRAVEL:
@@ -384,6 +387,29 @@ const friend_request_response = async (id, data) => {
   }
   payload = { success: false, error: 'Something Went Wrong' };
   return Promise.reject({ status: 500, payload });
+}
+
+const remove_friend = async (id, friend_id) => {
+  const users = db.getDB().collection('users');
+  let user = await users.findOne({ _id: id });
+  let friend = await users.findOne({ _id: friend_id });
+
+  let user_index = friend.friends.indexOf(id);
+  let friend_index = user.friends.indexOf(friend._id);
+
+  user.friends.splice(friend_index, 1);
+  friend.friends.splice(user_index, 1);
+
+  let user_friends = user.friends;
+  let friend_friends = friend.friends;
+
+  let updated_friend = await users.findOneAndUpdate({ _id: friend._id }, { $set: { friends: friend_friends } });
+  let updated_user = await users.findOneAndUpdate({ _id: id }, { $set: { friends: user_friends } });
+
+  if (updated_friend && updated_user) {
+    return Promise.resolve({ status: 200, payload: { success: true } });
+  }
+  return Promise.reject({ status: 500, payload: { success: false, error: 'Something Went Wrong!' } });
 }
 
 module.exports = MemberService;

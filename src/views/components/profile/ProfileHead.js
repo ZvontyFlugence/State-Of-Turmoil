@@ -2,6 +2,7 @@ import React from 'react';
 import { useHistory } from 'react-router';
 import { connect } from 'react-redux';
 import SoTApi from 'services/SoTApi';
+import authActions from 'store/auth/actions';
 
 // PrimeReact
 import { Button } from 'primereact/button';
@@ -22,7 +23,13 @@ const ProfileHead = props => {
   }
 
   const removeFriend = () => {
-    // TODO: Implement API Call
+    SoTApi.doAction({ action: 'remove_friend', friend_id: props.profile._id })
+      .then(data => {
+        if (data.success) {
+          props.growl.show({ severity: 'success', summary: 'Removed Friend' });
+          props.loadUser();
+        }
+      });
   }
 
   return (
@@ -87,4 +94,8 @@ const mapStateToProps = state => ({
   growl: state.growl.el,
 });
 
-export default connect(mapStateToProps)(ProfileHead);
+const mapDispatchToProps = dispatch => ({
+  loadUser: () => dispatch(authActions.loadUser()),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(ProfileHead);
