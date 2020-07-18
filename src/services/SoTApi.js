@@ -32,6 +32,8 @@ SoTApi.doAction = payload => client.patch('/user/action', payload);
 // Company
 SoTApi.getCompany = id => client.get(`/companies/${id}`);
 SoTApi.getCompanies = ceo_id => client.get(`/companies/ceo/${ceo_id}`);
+SoTApi.updateCompDetails = (comp_id, payload) => client.post(`/companies/${comp_id}`, payload);
+SoTApi.deleteCompany = comp_id => client.delete(`/companies/${comp_id}`);
 
 // Regions
 SoTApi.getRegion = id => client.get(`/regions/${id}`);

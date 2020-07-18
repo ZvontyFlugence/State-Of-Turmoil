@@ -13,13 +13,16 @@ import Private from './layouts/private';
 const Company = props => {
   const id = props.match.params.id;
   const [company, setCompany] = useState(null);
+  const [manageMode, setManageMode] = useState(false);
+  const [reload, setReload] = useState(true);
 
   useEffect(() => {
-    if (!company) {
+    if (reload) {
       SoTApi.getCompany(id)
         .then(data => {
           if (data.company) {
             setCompany(data.company);
+            setReload(false);
           }
         });
     }
@@ -31,10 +34,16 @@ const Company = props => {
         <div id='company' style={{ paddingLeft: '1vw', paddingRight: '1vw' }}>
           <div className='p-grid p-dir-col'>
             <div className='p-col-12'>
-              <CompanyHeader user={props.user} company={company} />
+              <CompanyHeader
+                user={props.user}
+                company={company}
+                manageMode={manageMode}
+                setManageMode={setManageMode}
+                setReload={setReload}
+              />
             </div>
             <div className='p-col-12'>
-              <CompanyInfo />
+              <CompanyInfo manageMode={manageMode} setReload={bool => setReload(bool)} />
             </div>
           </div>
         </div>

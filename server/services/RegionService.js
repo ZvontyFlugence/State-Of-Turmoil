@@ -69,7 +69,7 @@ RegionService.updateNeighbors = async data => {
   if (updated) {
     return Promise.resolve({ status: 200, payload: { updated: true } });
   }
-  return Promise.reject({ status: 500, payload: { updated: false } });
+  return Promise.resolve({ status: 500, payload: { updated: false } });
 }
 
 RegionService.getDistance = async (src, dest) => {

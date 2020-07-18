@@ -34,8 +34,8 @@ const constants = {
   ],
   RESOURCES: [
       { label: 'None', value: 0 },
-      { label: 'Wheat', value: 1, css: 'sot-wheat' },
-      { label: 'Iron', value: 2, css: 'sot-iron' },
+      { label: 'Wheat', value: 1, css: 'sot-wheat', isRaw: true },
+      { label: 'Iron', value: 2, css: 'sot-iron', isRaw: true },
   ],
   COMPANY_TYPES: [
     { label: 'None', value: 0, disabled: true },

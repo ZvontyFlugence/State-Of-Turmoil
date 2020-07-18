@@ -20,7 +20,7 @@ StatsService.citizenStats = async body => {
 
   if (!citizens) {
     let payload = { error: 'Something Unexpected Happened' };
-    return Promise.reject({ status: 500, payload });
+    return Promise.resolve({ status: 500, payload });
   }
 
   switch (body.stat.toUpperCase()) {
@@ -30,7 +30,7 @@ StatsService.citizenStats = async body => {
       break;
     default:
       let payload = { error: 'Unsupported Stat' };
-      return Promise.reject({ status: 400, payload });
+      return Promise.resolve({ status: 400, payload });
   }
 
   return Promise.resolve({ status: 200, payload: { citizens } });
@@ -61,7 +61,7 @@ StatsService.countryStats = async body => {
   
   if (!countries) {
     let payload = { error: 'Something Unexpected Happened' };
-    return Promise.reject({ status: 500, payload });
+    return Promise.resolve({ status: 500, payload });
   }
 
   switch (body.stat.toUpperCase()) {
@@ -74,7 +74,7 @@ StatsService.countryStats = async body => {
       break;
     default:
       let payload = { error: 'Unsupported Country Stat' };
-      return Promise.reject({ status: 400, payload });
+      return Promise.resolve({ status: 400, payload });
   }
 
   if (body.hasOwnProperty('limit')) {

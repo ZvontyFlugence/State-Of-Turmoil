@@ -20,14 +20,14 @@ ShoutsService.sendShout = async data => {
     case 'party':
       if (!data.party_id || data.party_id === 0) {
         payload = { success: false, error: 'Invalid Party Id' };
-        return Promise.reject({ status: 400, payload })
+        return Promise.resolve({ status: 400, payload })
       }
 
       shout_obj[data.scope] = data.party_id;
     case 'unit':
       if (!data.unit_id || data.unit_id === 0) {
         payload = { success: false, error: 'Invalid Unit Id' };
-        return Promise.reject({ status: 400, payload })
+        return Promise.resolve({ status: 400, payload })
       }
 
       shout_obj[data.scope] = data.unit_id;
@@ -41,7 +41,7 @@ ShoutsService.sendShout = async data => {
     return Promise.resolve({ status: 201, payload: { success: true } });
   }
   payload = { error: 'Something Unexpected Happened' };
-  return Promise.reject({ status: 500, payload });
+  return Promise.resolve({ status: 500, payload });
 }
 
 ShoutsService.sendReply = async data => {
@@ -64,10 +64,10 @@ ShoutsService.sendReply = async data => {
       return Promise.resolve({ status: 201, payload });
     }
     payload = { error: 'Something Unexpected Happened' };
-    return Promise.reject({ status: 500, payload });
+    return Promise.resolve({ status: 500, payload });
   }
   payload = { error: 'Shout Not Found' };
-  return Promise.reject({ status: 404, payload });
+  return Promise.resolve({ status: 404, payload });
 }
 
 ShoutsService.getShout = async id => {
@@ -81,7 +81,7 @@ ShoutsService.getShout = async id => {
     return Promise.resolve({ status: 200, payload: { shout } });
   }
   payload = { error: 'Shout Not Found' };
-  return Promise.reject({ status: 404, payload });
+  return Promise.resolve({ status: 404, payload });
 }
 
 ShoutsService.globalShouts = async () => {
@@ -98,7 +98,7 @@ ShoutsService.globalShouts = async () => {
     return Promise.resolve({ status: 200, payload });
   }
   payload = { error: 'Global Shouts Not Found' };
-  return Promise.reject({ status: 404, payload });
+  return Promise.resolve({ status: 404, payload });
 }
 
 ShoutsService.countryShouts = async countryID => {
@@ -115,7 +115,7 @@ ShoutsService.countryShouts = async countryID => {
     return Promise.resolve({ status: 200, payload });
   }
   payload = { error: 'Country Shouts Not Found' };
-  return Promise.reject({ status: 404, payload });
+  return Promise.resolve({ status: 404, payload });
 }
 
 ShoutsService.partyShouts = async partyID => {
@@ -132,7 +132,7 @@ ShoutsService.partyShouts = async partyID => {
     return Promise.resolve({ status: 200, payload });
   }
   payload = { error: 'Party Shouts Not Found' };
-  return Promise.reject({ status: 404, payload });
+  return Promise.resolve({ status: 404, payload });
 }
 
 ShoutsService.unitShouts = async unitID => {
@@ -149,7 +149,7 @@ ShoutsService.unitShouts = async unitID => {
     return Promise.resolve({ status: 200, payload });
   }
   payload = { error: 'Military Unit Shouts Not Found' };
-  return Promise.reject({ status: 404, payload });
+  return Promise.resolve({ status: 404, payload });
 }
 
 module.exports = ShoutsService;

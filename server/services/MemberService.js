@@ -10,6 +10,7 @@ const MemberActions = {
   DELETE_ALERT: 'DELETE_ALERT',
   FRIEND_REQUEST_RESPONSE: 'FRIEND_REQUEST_RESPONSE',
   HEAL: 'HEAL',
+  LEVEL_UP: 'LEVEL_UP',
   READ_ALERT: 'READ_ALERT',
   REMOVE_FRIEND: 'REMOVE_FRIEND',
   SEND_FRIEND_REQUEST: 'SEND_FRIEND_REQUEST',
@@ -89,7 +90,7 @@ MemberService.getAllUsers = async () => {
     return Promise.resolve({ status: 200, payload: { users } });
   }
   const payload = { error: 'No Users Found' };
-  return Promise.reject({ status: 404, payload });
+  return Promise.resolve({ status: 404, payload });
 }
 
 MemberService.doAction = async (id, body) => {
@@ -122,7 +123,7 @@ MemberService.doAction = async (id, body) => {
       return await upload(id, body.image);
     default:
       const payload = { success: false, error: 'Unsupported Action!' };
-      return Promise.reject({ status: 400, payload });
+      return Promise.resolve({ status: 400, payload });
   }
 }
 
@@ -134,12 +135,12 @@ const train = async id => {
 
   if (user.canTrain > new Date(Date.now())) {
     const payload = { success: false, error: 'You cannot train yet' };
-    return Promise.reject({ status: 400, payload });
+    return Promise.resolve({ status: 400, payload });
   }
 
   if (user.health < 10) {
     const payload = { success: false, error: 'Insufficient Health!' };
-    return Promise.reject({ status: 400, payload });
+    return Promise.resolve({ status: 400, payload });
   }
 
   let updates = {
@@ -149,10 +150,10 @@ const train = async id => {
     canTrain: new Date(new Date().setHours(24, 0, 0, 0)),
   };
 
-  // TODO: Create alert for level ups
   if (updates.xp >= neededXP(user.level)) {
     updates.level = user.level + 1;
     updates.gold = user.gold + 1.0;
+    updates.alerts = [...user.alerts, buildLevelUpAlert(updates.level)];
   }
 
   const updated_user = await users.findOneAndUpdate({ _id: user._id }, { $set: updates }, { new: true });
@@ -161,7 +162,7 @@ const train = async id => {
     return Promise.resolve({ status: 200, payload: { success: true } });
   }
   const payload = { success: false, error: 'Something Unexpected Happened!' };
-  return Promise.reject({ status: 500, payload });
+  return Promise.resolve({ status: 500, payload });
 }
 
 const heal = async id => {
@@ -171,12 +172,12 @@ const heal = async id => {
 
   if (user.canHeal > new Date(Date.now())) {
     payload = { success: false, error: 'You\'ve already healed today' };
-    return Promise.reject({ status: 400, payload });
+    return Promise.resolve({ status: 400, payload });
   }
 
   if (user.health === 100) {
     payload = { success: false, error: 'You\'re already at max health!' };
-    return Promise.reject({ status: 400, payload });
+    return Promise.resolve({ status: 400, payload });
   }
 
   const canHeal = new Date(new Date().setHours(24, 0, 0, 0));
@@ -187,7 +188,7 @@ const heal = async id => {
     return Promise.resolve({ status: 200, payload: { success: true } });
   }
   payload = { success: false, error: 'Something Unexpected Happened!' };
-  return Promise.reject({ status: 500, payload });
+  return Promise.resolve({ status: 500, payload });
 }
 
 const upload = async (id, image) => {
@@ -195,7 +196,7 @@ const upload = async (id, image) => {
   
   if (!image) {
     const payload = { success: false, error: 'Invalid Base64 Image' };
-    return Promise.reject({ status: 400, payload });
+    return Promise.resolve({ status: 400, payload });
   }
 
   let updated_user = await users.findOneAndUpdate({ _id: id }, { $set: { image } }, { new: true });
@@ -204,7 +205,7 @@ const upload = async (id, image) => {
     return Promise.resolve({ status: 200, payload: { success: true } });
   }
   const payload = { success: false, error: 'Something Unexpected Happened!' };
-  return Promise.reject({ status: 500, payload });
+  return Promise.resolve({ status: 500, payload });
 }
 
 const send_friend_request = async (id, friend_id) => {
@@ -229,7 +230,7 @@ const send_friend_request = async (id, friend_id) => {
   if (updated_friend && updated_user) {
     return Promise.resolve({ status: 200, payload: { success: true  } });
   }
-  return Promise.reject({ status: 500, payload: { success: false, error: 'Something Unexpected Happened!' } });
+  return Promise.resolve({ status: 500, payload: { success: false, error: 'Something Unexpected Happened!' } });
 }
 
 const read_alert = async (id, alert) => {
@@ -243,12 +244,12 @@ const read_alert = async (id, alert) => {
       return Promise.resolve({ status: 200, payload: { success: true } })
     } else {
       const payload = { success: false, error: 'Something Unexpected Happened' };
-      return Promise.reject({ status: 500, payload });
+      return Promise.resolve({ status: 500, payload });
     }
   }
 
   const payload = { success: false, error: 'Alert Not Found' };
-  return Promise.reject({ status: 404, payload });
+  return Promise.resolve({ status: 404, payload });
 }
 
 const delete_alert = async (id, alert) => {
@@ -263,12 +264,12 @@ const delete_alert = async (id, alert) => {
       return Promise.resolve({ status: 200, payload: { success: true } });
     } else {
       const payload = { success: false, error: 'Something Unexpected Happened' };
-      return Promise.reject({ status: 500, payload });
+      return Promise.resolve({ status: 500, payload });
     }
   }
 
   const payload = { success: false, error: 'Alert Not Found' };
-  return Promise.reject({ status: 404, payload });
+  return Promise.resolve({ status: 404, payload });
 }
 
 const update_desc = async (id, description) => {
@@ -281,7 +282,7 @@ const update_desc = async (id, description) => {
   }
   
   const payload = { success: false, error: 'Something Unexpected Happened' };
-  return Promise.reject({ status: 500, payload });
+  return Promise.resolve({ status: 500, payload });
 }
 
 const shout = async (id, data) => {
@@ -299,11 +300,11 @@ const create_company = async (id, data) => {
   let user = await MemberService.getUser(id);
 
   if (user.gold < 25) {
-    return Promise.reject({ status: 400, payload: { success: false, error: 'Insufficient Funds' } });
+    return Promise.resolve({ status: 400, payload: { success: false, error: 'Insufficient Funds' } });
   }
 
   if (data.type === 0) {
-    return Promise.reject({ status: 400, payload: { success: false, error: 'Invalid Company Type' } });
+    return Promise.resolve({ status: 400, payload: { success: false, error: 'Invalid Company Type' } });
   }
 
   data.ceo = id;
@@ -320,10 +321,10 @@ const create_company = async (id, data) => {
       console.log('RESULT SUCCESS:', result);
       return Promise.resolve(result);
     }
-    return Promise.reject({ status: 500, payload: { success: false, error: 'Something Unexpected Happened' } });
+    return Promise.resolve({ status: 500, payload: { success: false, error: 'Something Unexpected Happened' } });
   }
   console.log('RESULT FAIL:', result);
-  return Promise.reject(result);
+  return Promise.resolve(result);
 }
 
 const travel = async (id, data) => {
@@ -331,14 +332,14 @@ const travel = async (id, data) => {
   let user = await MemberService.getUser(id);
   if (user) {
     if (user.location === data.dest) {
-      return Promise.reject({ status: 400, payload: { success: false, error: 'Already Located In Region' } });
+      return Promise.resolve({ status: 400, payload: { success: false, error: 'Already Located In Region' } });
     }
 
     let travelInfo = await RegionService.getDistance(user.location, data.dest);
 
     if (travelInfo) {
       if (user.gold < travelInfo.cost) {
-        return Promise.reject({ status: 400, payload: { success: false, error: 'Insufficient Funds' } });
+        return Promise.resolve({ status: 400, payload: { success: false, error: 'Insufficient Funds' } });
       }
 
       const location = data.dest;
@@ -348,9 +349,9 @@ const travel = async (id, data) => {
       if (updated)
         return Promise.resolve({ status: 200, payload: { success: true } });
     }
-    return Promise.reject({ status: 500, payload: { success: false, error: 'Something Went Wrong' } });
+    return Promise.resolve({ status: 500, payload: { success: false, error: 'Something Went Wrong' } });
   }
-  return Promise.reject({ status: 404, payload: { success: false, error: 'User Not Found' } });
+  return Promise.resolve({ status: 404, payload: { success: false, error: 'User Not Found' } });
 }
 
 const friend_request_response = async (id, data) => {
@@ -376,7 +377,7 @@ const friend_request_response = async (id, data) => {
       break;
     default:
       payload = { success: false, error: 'Invalid Response Type' };
-      return Promise.reject({ status: 400, payload });
+      return Promise.resolve({ status: 400, payload });
   }
 
   let updated_friend = users.findOneAndUpdate({ _id: friend._id }, { $set: friend_updates });
@@ -386,7 +387,7 @@ const friend_request_response = async (id, data) => {
     return Promise.resolve({ status: 200, payload: { success: true } });
   }
   payload = { success: false, error: 'Something Went Wrong' };
-  return Promise.reject({ status: 500, payload });
+  return Promise.resolve({ status: 500, payload });
 }
 
 const remove_friend = async (id, friend_id) => {
@@ -409,7 +410,14 @@ const remove_friend = async (id, friend_id) => {
   if (updated_friend && updated_user) {
     return Promise.resolve({ status: 200, payload: { success: true } });
   }
-  return Promise.reject({ status: 500, payload: { success: false, error: 'Something Went Wrong!' } });
+  return Promise.resolve({ status: 500, payload: { success: false, error: 'Something Went Wrong!' } });
 }
+
+const buildLevelUpAlert = level => ({
+  read: false,
+  type: MemberActions.LEVEL_UP,
+  message: `Congrats! You have leveled up to level ${level} and received 1 gold`,
+  timestamp: new Date(Date.now()),
+});
 
 module.exports = MemberService;
