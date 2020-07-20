@@ -15,14 +15,17 @@ const AlertItem = props => {
     {
       label: 'Mark as Read',
       icon: 'pi pi-eye',
+      className: props.alert.read && 'p-disabled',
       command: () => {
         props.alert.index = props.index;
-        SoTApi.doAction({ action: 'read_alert', alert: props.alert })
-          .then(data => {
-            if (data.success) {
-              props.loadUser();
-            }
-          });
+        if (!props.alert.read) {
+          SoTApi.doAction({ action: 'read_alert', alert: props.alert })
+            .then(data => {
+              if (data.success) {
+                props.loadUser();
+              }
+            });
+        }
       }
     },
     {
