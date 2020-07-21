@@ -37,6 +37,9 @@ const constants = {
       { label: 'Wheat', value: 1, css: 'sot-wheat', isRaw: true },
       { label: 'Iron', value: 2, css: 'sot-iron', isRaw: true },
   ],
+  ITEMS: [
+      { id: 0, label: 'Iron', quality: 0, image: 'sot-iron' }
+  ],
   COMPANY_TYPES: [
     { label: 'None', value: 0, disabled: true },
     { label: 'Wheat', value: 1, css: 'sot-wheat' },
