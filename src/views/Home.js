@@ -6,10 +6,11 @@ import actions from 'store/auth/actions';
 // PrimeReact
 import { Button } from 'primereact/button';
 import { Fieldset } from 'primereact/fieldset';
+import { Message } from 'primereact/message';
 
 // Components
 import Private from './layouts/private';
-import { Message } from 'primereact/message';
+import Inventory from './components/shared/Inventory';
 
 const Home = props => {
 
@@ -49,7 +50,8 @@ const Home = props => {
           </div>
           <div className='p-col-10 p-offset-1'>
             <Fieldset legend='Inventory'>
-
+              { console.log('USER OBJ', props.user) }
+              <Inventory items={(props.user && props.user.inventory) || []} emptyMessage='No items' />
             </Fieldset>
           </div>
         </div>
