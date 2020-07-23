@@ -42,7 +42,14 @@ RegionService.getRegion = async id => {
 
 RegionService.getAllRegions = async () => {
   const regions = db.getDB().collection('regions');
-  return await regions.find({}).toArray();
+  let region_list = await regions.find({}).toArray();
+
+  region_list = await Promise.all(region_list.map(async region => {
+    region.owner = await CountryService.getCountry(region.owner);
+    return region;
+  }));
+
+  return region_list;
 }
 
 RegionService.startingRegion = async country_id => {

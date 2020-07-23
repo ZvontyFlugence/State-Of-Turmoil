@@ -87,12 +87,14 @@ const Sidebar = props => {
     return <span>XP: {props.user && props.user.xp}/{xpNeeded}</span>;
   }
 
+  const getSidebarToggleTooltip = () => props.sidebarExpanded ? 'Minimize Sidebar' : 'Expand Sidebar';
+
   if (props.user && countryInfo && regionInfo && walletInfo) {
     return (
       <>
         <div className='p-col-fixed side-nav-container'>
           <Card className='side-nav'>
-            <Button className='side-nav-item' icon='pi pi-angle-right' tooltip='Expand Sidebar' onClick={toggleSideNavLg} />
+            <Button className='side-nav-item' icon={`pi pi-angle-${props.sidebarExpanded ? 'left' : 'right'}`} tooltip={getSidebarToggleTooltip()} onClick={toggleSideNavLg} />
             <Button className='side-nav-item' icon='pi pi-user' tooltip='My Profile' onClick={() => history.push(`/profile/${props.user._id}`)} />
             <Button className='side-nav-item' icon='pi pi-envelope' tooltip='Mail' onClick={() => history.push('/mail')} />
             <Button className='side-nav-item' icon='pi pi-bell' tooltip='Alerts' onClick={() => history.push('/alerts')} style={{ color: getAlertsColor() }} />

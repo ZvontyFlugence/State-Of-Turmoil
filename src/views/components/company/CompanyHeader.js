@@ -7,15 +7,21 @@ import constants from 'util/constants';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { Dialog } from 'primereact/dialog';
+import { Dropdown } from 'primereact/dropdown';
+import { Inplace, InplaceDisplay, InplaceContent } from 'primereact/inplace';
 import { InputText } from 'primereact/inputtext';
+import { Message } from 'primereact/message';
 
 const CompanyHeader = props => {
   let history = useHistory();
   let type = constants.COMPANY_TYPES[props.company.type];
   const [regionInfo, setRegionInfo] = useState(null);
+  const [regions, setRegions] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [name, setName] = useState('');
-  
+  const [location, setLocation] = useState(0);
+  const [updateError, setUpdateError] = useState('');
+
   useEffect(() => {
     if (props.company && !regionInfo) {
       SoTApi.getRegion(props.company.location)
@@ -50,6 +56,60 @@ const CompanyHeader = props => {
           props.setReload(true);
         }
       });
+  }
+
+  const getRegions = () => {
+    SoTApi.getRegions().then(data => {
+      if (data.regions) {
+        setRegions(data.regions);
+      }
+    });
+  }
+
+  const regionTemplate = region => {
+    return (
+      <span>
+        { region.name }
+        <i className={`flag-icon flag-icon-${region.owner.flag_code}`} />
+      </span>
+    );
+  }
+
+  const handleSetUpdateError = error => {
+    if (updateError !== error) {
+      setUpdateError(error);
+    }
+  }
+
+  const updateDisabled = () => {
+    let hasName = !!name;
+    let notRelocating = location === 0;
+    let invalidLocation = location === (props.company && props.company.location);
+    let sufficientFunds = (props.user && props.user.gold) >= 10;
+
+    if (notRelocating && !hasName) {
+      handleSetUpdateError('No updates detected!');
+      return true;
+    } else if (!notRelocating && invalidLocation) {
+      handleSetUpdateError('Cannot relocate to current location!');
+      return true;
+    } else if (!notRelocating && !sufficientFunds) {
+      handleSetUpdateError('Insufficient funds for relocation!');
+      return true;
+    } else {
+      handleSetUpdateError('');
+      return false;
+    }
+  }
+
+  const clearRelocation = () => {
+    setLocation(0);
+    setUpdateError('');
+  }
+
+  const handleHideModal = () => {
+    clearRelocation();
+    setShowModal(false);
   }
 
   return (
@@ -98,7 +158,7 @@ const CompanyHeader = props => {
               <br />
               <span>Employees: { props.company.employees.length }</span>
               <br />
-              <span>Worth: {displayWorth()} USD</span>
+              <span>Worth: {displayWorth()} <i className='sot-coin' /></span>
             </div>
           </div>
         </div>
@@ -115,7 +175,7 @@ const CompanyHeader = props => {
           </div>
         )}
       </div>
-      <Dialog header='Update Company Details' visible={showModal} onHide={() => setShowModal(false)} modal>
+      <Dialog header='Update Company Details' visible={showModal} onHide={handleHideModal} style={{ width: '50%' }} modal>
         <div className='p-grid p-fluid'>
           <div className='p-col-12'>
             <span className='p-float-label'>
@@ -123,8 +183,44 @@ const CompanyHeader = props => {
               <label htmlFor='comp-name'>Company Name</label>
             </span>
           </div>
+          <div className='p-col-12'>              
+            <Inplace onOpen={getRegions} onClose={clearRelocation} closable>
+              <InplaceDisplay>
+                <span>Click to Relocate</span>
+              </InplaceDisplay>
+              <InplaceContent>
+                <label>Select New Location:</label>
+                <br />
+                <Dropdown
+                  optionLabel='name'
+                  optionValue='_id'
+                  value={location}
+                  options={regions}
+                  itemTemplate={regionTemplate}
+                  onChange={e => setLocation(e.value)}
+                />
+                {location !== 0 && location !== (props.company && props.company.location) && (
+                  <div style={{ marginBottom: '10px' }}>
+                    <div style={{ marginTop: '10px' }}>
+                      <span>Cost to Relocate: </span>
+                      <span style={{ float: 'right' }}>10.00 <i className='sot-coin' /></span>
+                    </div>
+                    <div style={{ marginTop: '10px' }}>
+                      <span>You have: </span>
+                      <span style={{ float: 'right' }}>{props.user && props.user.gold.toFixed(2)} <i className='sot-coin' /></span>
+                    </div>
+                  </div>
+                )}                
+              </InplaceContent>
+            </Inplace>
+          </div>
+          {!!updateError && (
+            <div className='p-col-12'>
+              <Message severity='warn' text={updateError} />
+            </div>
+          )}
           <div className='p-col'>
-            <Button label='Update' onClick={handleUpdate} />
+            <Button label='Update' onClick={handleUpdate} disabled={updateDisabled()} />
           </div>
           <div className='p-col'>
             <Button className='p-button-danger' label='Delete' onClick={handleDelete} />

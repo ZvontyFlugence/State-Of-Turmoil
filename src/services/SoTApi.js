@@ -37,6 +37,7 @@ SoTApi.deleteCompany = comp_id => client.delete(`/companies/${comp_id}`);
 
 // Regions
 SoTApi.getRegion = id => client.get(`/regions/${id}`);
+SoTApi.getRegions = () => client.get('/regions');
 SoTApi.getTravelDistance = payload => client.post('/regions/travel-distance', payload);
 
 // Shouts
