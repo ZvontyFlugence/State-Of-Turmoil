@@ -34,6 +34,13 @@ router.delete('/:id', auth, async (req, res) => {
   return res.status(result.status).json(result.payload);
 });
 
+router.post('/:id/action', auth, async (req, res) => {
+  const compId = Number.parseInt(req.params.id);
+  let result = await CompService.doAction(compId, req.body);
+
+  return res.status(result.status).json(result.payload);
+});
+
 router.post('/:id/details', auth, async (req, res) => {
   let comp_id = Number.parseInt(req.params.id);
   let result = await CompService.updateCompanyDetails(req.user_id, comp_id, req.body);

@@ -1,6 +1,12 @@
 const db = require('../db');
 
 const CompService = {};
+const CompActions = {
+  CREATE_JOB_OFFER: 'CREATE_JOB_OFFER',
+  SELL_PRODUCT: 'SELL_PRODUCT',
+  UNLIST_JOB: 'UNLIST_JOB',
+  UNLIST_PRODUCT: 'UNLIST_PRODUCT',
+};
 
 CompService.createCompany = async data => {
   let companies = db.getDB().collection('companies');
@@ -92,6 +98,37 @@ CompService.getCompany = async id => {
 CompService.getUserCompanies = async ceo_id => {
   const companies = db.getDB().collection('companies');
   return await companies.find({ ceo: ceo_id }).toArray();
+}
+
+CompService.doAction = async (id, body) => {
+  switch (body.action.toUpperCase()) {
+    case CompActions.SELL_PRODUCT:
+      return await sell_product(id, body.productOffer);
+    default:
+      const payload = { success: false, error: 'Unsupported Action!' };
+      return Promise.resolve({ status: 400, payload });
+  }
+}
+
+const sell_product = async (id, productOffer) => {
+  const companies = db.getDB().collection('companies');
+  let company = await companies.findOne({ _id: id });
+  let payload = { success: false, error: 'Something Went Wrong!'};
+
+  if (!company) {
+    payload = { success: false, error: 'Company Not Found!' };
+    return Promise.resolve({ status: 404, payload });
+  }
+
+  let updates = { productOffers: [...company.productOffers, productOffer] };
+  let updated = companies.findOneAndUpdate({ _id: id }, { $set: updates });
+
+  if (updated) {
+    payload = { success: true };
+    return Promise.resolve({ status: 200, payload });
+  }
+
+  return Promise.resolve({ status: 500, payload });
 }
 
 module.exports = CompService;

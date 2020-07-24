@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { connect } from 'react-redux';
 import constants from 'util/constants';
 
 // PrimeReact
@@ -14,6 +15,7 @@ import { TabView, TabPanel } from 'primereact/tabview';
 
 // Components
 import Inventory from '../shared/Inventory';
+import SoTApi from 'services/SoTApi';
 
 const CompanyInfo = props => {
   let context = useRef(null);
@@ -23,7 +25,7 @@ const CompanyInfo = props => {
   const [sellPrice, setSellPrice] = useState(0.00);
 
   const contextMenuItems = [
-    { label: 'Sell Item', command: () => { setShowModal(true); } }
+    { label: 'Sell Item', command: () => setShowModal(true) }
   ];
 
   const getInventoryItems = () => {
@@ -32,6 +34,7 @@ const CompanyInfo = props => {
     for (let i = 0; i < props.inventory.length; i++) {
       let item = constants.ITEMS[props.inventory[i].id];
       items.push({
+        id: item.id,
         label: item.label,
         image: item.image,
         quantity: props.inventory[i].quantity,
@@ -44,6 +47,22 @@ const CompanyInfo = props => {
   const hideModal = () => {
     setShowModal(false);
     setSelected(null);
+  }
+
+  const sellProduct = () => {
+    let payload = {
+      action: 'sell_product',
+      productOffer: { id: selected.id, quantity: sellAmount, price: sellPrice },
+    };
+
+    SoTApi.doCompAction(props.compId, payload)
+      .then(data => {
+        if (data.success) {
+          props.growl.show({ severity: 'success', summary: 'Product Listed For Sell' });
+          hideModal(true);
+          props.setReload(true);
+        }
+      });
   }
 
   return props.manageMode ? (
@@ -80,7 +99,7 @@ const CompanyInfo = props => {
               <InputNumber value={sellPrice} onChange={e => setSellPrice(e.value)} mode='currency' currency={props.funds && props.funds.currency} currencyDisplay='code' />
             </div>
             <div className='p-col'>
-              <Button label='Sell Product' />
+              <Button label='Sell Product' onClick={sellProduct} />
             </div>
           </div>
         ) : (
@@ -97,4 +116,8 @@ const CompanyInfo = props => {
   );
 }
 
-export default CompanyInfo;
+const mapStateToDispatch = state => ({
+  growl: state.growl.el,
+});
+
+export default connect(mapStateToDispatch)(CompanyInfo);

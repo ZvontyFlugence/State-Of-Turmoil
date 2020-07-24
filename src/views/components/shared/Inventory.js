@@ -31,7 +31,7 @@ const Inventory = props => {
 
   const setupContext = (e, item, invItem) => {
     props.cm.current.show(e);
-    let selected = { label: item.label, image: item.image, quantity: invItem.quantity };
+    let selected = { id: item.id, label: item.label, image: item.image, quantity: invItem.quantity };
     props.setSelected(selected);
   }
 

@@ -26,7 +26,7 @@ const Company = props => {
           }
         });
     }
-  });
+  }, [id, reload]);
 
   if (company) {
     return (
@@ -43,7 +43,7 @@ const Company = props => {
               />
             </div>
             <div className='p-col-12'>
-              <CompanyInfo inventory={company.inventory} funds={company.funds} manageMode={manageMode} setReload={bool => setReload(bool)} />
+              <CompanyInfo compId={company._id} inventory={company.inventory} funds={company.funds} manageMode={manageMode} setReload={bool => setReload(bool)} />
             </div>
           </div>
         </div>
