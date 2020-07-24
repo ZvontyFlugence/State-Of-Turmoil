@@ -36,9 +36,9 @@ StatsService.citizenStats = async body => {
   return Promise.resolve({ status: 200, payload: { citizens } });
 }
 
-const citizens_by_country = async country_code => {
-  let country = await CountryService.getCountryByFlagCode(country_code);
-  let users = await CountryService.getCitizens(country._id);
+const citizens_by_country = async country_id => {
+  let country = await CountryService.getCountry(country_id);
+  let users = await CountryService.getCitizens(country_id);
 
   return users.map(u => {
     u.country = { _id: country._id, name: country.name, flag: country.flag_code };
