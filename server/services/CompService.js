@@ -120,7 +120,19 @@ const sell_product = async (id, productOffer) => {
     return Promise.resolve({ status: 404, payload });
   }
 
-  let updates = { productOffers: [...company.productOffers, productOffer] };
+  // Validate that the company has the requested item and quantity in their inventory
+  let item = company.inventory.find(item => item.id === productOffer.id);
+  if (!item) {
+    payload = { success: false, error: 'Company does not have that item in its inventory' };
+    return Promise.resolve({ status: 400, payload });
+  } else if (item.quantity < productOffer.quantity) {
+    payload = { success: false, error: 'Cannot sell more items than owned' };
+    return Promise.resolve({ status: 400, payload });
+  }
+  
+  item.quantity -= productOffer.quantity;
+
+  let updates = { productOffers: [...company.productOffers, productOffer], inventory: company.inventory };
   let updated = companies.findOneAndUpdate({ _id: id }, { $set: updates });
 
   if (updated) {
