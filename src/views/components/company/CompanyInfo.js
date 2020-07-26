@@ -9,6 +9,7 @@ import { ContextMenu } from 'primereact/contextmenu';
 import { Dialog } from 'primereact/dialog';
 import { Dropdown } from 'primereact/dropdown';
 import { InputNumber } from 'primereact/inputnumber';
+import { ListBox } from 'primereact/listbox';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { Slider } from 'primereact/slider';
 import { TabView, TabPanel } from 'primereact/tabview';
@@ -20,9 +21,11 @@ import SoTApi from 'services/SoTApi';
 const CompanyInfo = props => {
   let context = useRef(null);
   const [showModal, setShowModal] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [selected, setSelected] = useState(null);
   const [sellAmount, setSellAmount] = useState(0);
   const [sellPrice, setSellPrice] = useState(0.00);
+  const [buyAmount, setBuyAmount] = useState(1);
 
   const contextMenuItems = [
     { label: 'Sell Item', command: () => setShowModal(true) }
@@ -63,6 +66,65 @@ const CompanyInfo = props => {
           props.setReload(true);
         }
       });
+  }
+
+  const getUserCC = () => {
+    if (props.funds && props.user) {
+      let cc = props.user.wallet.find(cc => cc.currency === props.funds.currency);
+      if (cc) {
+        return cc.amount;
+      }
+    }
+
+    return 0.00;
+  }
+
+  const isSufficientFunds = price => {
+    console.log('Is Sufficient Funds: ', (buyAmount * price).toFixed(2) > getUserCC());
+    console.log('Buy Price: ', (buyAmount * price).toFixed(2));
+    console.log('CC: ', getUserCC());
+    return (buyAmount * price).toFixed(2) > getUserCC();
+  }
+
+  const productOfferTemplate = offer => {
+    let offer_item = constants.ITEMS[offer.id];
+    return (
+      <div className='p-grid p-align-center' style={{ padding: '2px 8px 0px' }}>
+        <div className='p-col'>
+          <span style={{ marginRight: '10px' }}><i className={offer_item.image} /></span>
+          <span style={{ fontSize: 18 }}>{ offer_item.label }</span>
+        </div>
+        <div className='p-col'>
+          <span>Quantity: { offer.quantity }</span>
+        </div>
+        <div className='p-col'>
+          <InputNumber
+            style={{ margin: '0px 15px' }}
+            min={1}
+            max={offer.quantity}
+            value={buyAmount}
+            onChange={e => setBuyAmount(e.value)}
+            size={15}
+            suffix={` for ${(buyAmount * offer.price).toFixed(2)} ${props.funds.currency}`}
+            showButtons
+          />
+        </div>
+        <div className='p-col-3' style={{ textAlign: 'center' }}>
+          <Button
+            className={isSufficientFunds(offer.price) && 'p-button-danger'}
+            label={isSufficientFunds(offer.price) ? 'Insufficient Funds' : 'Purchase'}
+            disabled={isSufficientFunds(offer.price)}
+            onClick={() => setShowConfirmModal(true)}
+          />
+        </div>
+        <Dialog header='Confirm Purchase' visible={showConfirmModal} onHide={() => setShowConfirmModal(false)} style={{ textAlign: 'center' }}>
+          <span>Are you sure you want to buy { buyAmount } { offer_item.label } for { (buyAmount * offer.price).toFixed(2) }?</span>
+          <br />
+          <br />
+          <Button label='Confirm Purchase' />
+        </Dialog>
+      </div>
+    );
   }
 
   return props.manageMode ? (
@@ -109,8 +171,24 @@ const CompanyInfo = props => {
     </>
   ) : (
     <Card>
-      <div className='p-grid'>
-        Product and Job Listings Here
+      <div className='p-grid' style={{ gap: 10 }}>
+        <div className='p-col'>
+          <span style={{ fontSize: '1.25em'}}>
+            Product Offers
+          </span>
+          <ListBox
+            className='sot-fake-disabled'
+            options={props.productOffers}
+            itemTemplate={productOfferTemplate}
+            style={{ width: 'inherit' }}
+            disabled
+          />
+        </div>
+        <div className='p-col'>
+          <span style={{ fontSize: '1.25em' }}>
+            Job Offers
+          </span>
+        </div>  
       </div>
     </Card>
   );
@@ -118,6 +196,7 @@ const CompanyInfo = props => {
 
 const mapStateToDispatch = state => ({
   growl: state.growl.el,
+  user: state.auth.user,
 });
 
 export default connect(mapStateToDispatch)(CompanyInfo);

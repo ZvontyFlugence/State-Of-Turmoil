@@ -43,7 +43,15 @@ const Company = props => {
               />
             </div>
             <div className='p-col-12'>
-              <CompanyInfo compId={company._id} inventory={company.inventory} funds={company.funds} manageMode={manageMode} setReload={bool => setReload(bool)} />
+              <CompanyInfo
+                compId={company._id}
+                inventory={company.inventory}
+                funds={company.funds}
+                productOffers={company.productOffers}
+                jobOffers={company.jobOffers}
+                manageMode={manageMode}
+                setReload={bool => setReload(bool)}
+              />
             </div>
           </div>
         </div>

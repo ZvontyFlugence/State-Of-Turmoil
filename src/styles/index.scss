@@ -12,10 +12,6 @@
     height: 200px;
   }
 
-  .sot-fake-disabled {
-    opacity: 1 !important;
-  }
-
   .p-listbox-item {
     outline: 1px solid #121212;
   }
@@ -46,4 +42,8 @@ a {
 
 .p-tooltip {
   z-index: 100;
+}
+
+.sot-fake-disabled {
+  opacity: 1 !important;
 }
