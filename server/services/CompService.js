@@ -104,6 +104,8 @@ CompService.doAction = async (id, body) => {
   switch (body.action.toUpperCase()) {
     case CompActions.SELL_PRODUCT:
       return await sell_product(id, body.productOffer);
+    case CompActions.UNLIST_PRODUCT:
+      return await unlist_product(id, body.offer);
     default:
       const payload = { success: false, error: 'Unsupported Action!' };
       return Promise.resolve({ status: 400, payload });
@@ -140,6 +142,41 @@ const sell_product = async (id, productOffer) => {
     return Promise.resolve({ status: 200, payload });
   }
 
+  return Promise.resolve({ status: 500, payload });
+}
+
+const unlist_product = async (id, offer) => {
+  const companies = db.getDB().collection('companies');
+  let company = await companies.findOne({ _id: id });
+  let payload = {};
+  let updates = {};
+
+  let comp_offer = company.productOffers.find(o => o.id === offer.id);
+  let inv_item = company.inventory.find(i => i.id === offer.id);
+
+  if (!comp_offer) {
+    payload = { success: false, error: 'Product Offer Not Found!' };
+    return Promise.resolve({ status: 404, payload });
+  }
+
+  if (inv_item) {
+    company.inventory.splice(company.inventory.indexOf(inv_item), 1);
+    inv_item.quantity += offer.quantity;
+    updates.inventory = [...company.inventory, inv_item];
+  }
+
+  let offer_index = company.productOffers.indexOf(comp_offer);
+  company.productOffers.splice(offer_index, 1);
+  updates.productOffers = [...company.productOffers];
+
+  let updated = await companies.findOneAndUpdate({ _id: id }, { $set: updates });
+  
+  if (updated) {
+    payload = { success: true };
+    return Promise.resolve({ status: 200, payload });
+  }
+
+  payload = { success: false, error: 'Something Went Wrong!' };
   return Promise.resolve({ status: 500, payload });
 }
 

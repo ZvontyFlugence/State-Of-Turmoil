@@ -1,6 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { connect } from 'react-redux';
 import constants from 'util/constants';
+import SoTApi from 'services/SoTApi';
+import authActions from 'store/auth/actions';
 
 // PrimeReact
 import { Button } from 'primereact/button';
@@ -16,12 +18,12 @@ import { TabView, TabPanel } from 'primereact/tabview';
 
 // Components
 import Inventory from '../shared/Inventory';
-import SoTApi from 'services/SoTApi';
 
 const CompanyInfo = props => {
   let context = useRef(null);
   const [showModal, setShowModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showEditOfferModal, setShowEditOfferModal] = useState(false);
   const [selected, setSelected] = useState(null);
   const [sellAmount, setSellAmount] = useState(0);
   const [sellPrice, setSellPrice] = useState(0.00);
@@ -80,10 +82,25 @@ const CompanyInfo = props => {
   }
 
   const isSufficientFunds = price => {
-    console.log('Is Sufficient Funds: ', (buyAmount * price).toFixed(2) > getUserCC());
-    console.log('Buy Price: ', (buyAmount * price).toFixed(2));
-    console.log('CC: ', getUserCC());
     return (buyAmount * price).toFixed(2) > getUserCC();
+  }
+
+  const buyItem = offer => {
+    let payload = {
+      action: 'purchase_item',
+      purchase: {
+        compId: props.compId,
+        offer,
+        purchaseAmount: buyAmount,
+      }
+    };
+
+    SoTApi.doAction(payload).then(data => {
+      if (data.success) {
+        props.growl.show({ severity: 'success', summary: 'Purchase Completed' });
+        props.loadUser();
+      }
+    });
   }
 
   const productOfferTemplate = offer => {
@@ -121,7 +138,51 @@ const CompanyInfo = props => {
           <span>Are you sure you want to buy { buyAmount } { offer_item.label } for { (buyAmount * offer.price).toFixed(2) } { props.funds.currency }?</span>
           <br />
           <br />
-          <Button label='Confirm Purchase' />
+          <Button label='Confirm Purchase' onClick={() => buyItem(offer)} />
+        </Dialog>
+      </div>
+    );
+  }
+
+  const unlistOffer = offer => {
+    let payload = {
+      action: 'unlist_product',
+      offer,
+    };
+
+    SoTApi.doCompAction(props.compId, payload)
+      .then(data => {
+        if (data.success) {
+          props.growl.show({ severity: 'success', summary: 'Product Offer Unlisted!' });
+          props.setReload(true);
+        }
+      });
+  }
+
+  const manageOffersTemplate = offer => {
+    let offer_item = constants.ITEMS[offer.id];
+    return (
+      <div className='p-grid p-align-center' style={{ padding: '2px 8px 0px' }}>
+        <div className='p-col'>
+          <span style={{ marginRight: '10px' }}><i className={offer_item.image} /></span>
+          <span style={{ fontSize: 18 }}>{ offer_item.label }</span>
+        </div>
+        <div className='p-col'>
+          <span>Quantity: { offer.quantity }</span>
+        </div>
+        <div className='p-col'>
+          <span>Sell Price: { offer.price } { props.funds.currency } per item</span>
+        </div>
+        <div className='p-col' style={{ textAlign: 'right' }}>
+          <Button label='Edit' style={{ marginRight: '10px' }} onClick={() => setShowEditOfferModal(true)} />
+          <Button className='p-button-danger' label='Remove' onClick={() => unlistOffer(offer)} />
+        </div>
+        <Dialog header='Edit Offer' visible={showEditOfferModal} onHide={() => setShowEditOfferModal(false)} style={{ textAlign: 'center' }}>
+          <div className='p-grid'>
+            <div className='p-col'>
+              <Button label='Update Offer' />
+            </div>
+          </div>
         </Dialog>
       </div>
     );
@@ -141,8 +202,21 @@ const CompanyInfo = props => {
         <TabPanel header='Employees'>
           Employee List and Management Here
         </TabPanel>
-        <TabPanel header='Treasury'>
-          Treasury Info Here
+        <TabPanel header='Treasury and Offers'>
+          <div className='p-grid' style={{ gap: 10 }}>
+            <div className='p-col'>
+              <span style={{ fontSize: '1.25em'}}>
+                Product Offers
+              </span>
+              <ListBox
+                className='sot-fake-disabled'
+                options={props.productOffers}
+                itemTemplate={manageOffersTemplate}
+                style={{ width: 'inherit' }}
+                disabled
+              />
+            </div>
+          </div>
         </TabPanel>
       </TabView>
       <Dialog header='Create Product Offer' visible={showModal} onHide={hideModal} modal>
@@ -194,9 +268,13 @@ const CompanyInfo = props => {
   );
 }
 
-const mapStateToDispatch = state => ({
+const mapStateToProps = state => ({
   growl: state.growl.el,
   user: state.auth.user,
 });
 
-export default connect(mapStateToDispatch)(CompanyInfo);
+const mapDispatchToProps = dispatch => ({
+  loadUser: () => dispatch(authActions.loadUser()),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(CompanyInfo);

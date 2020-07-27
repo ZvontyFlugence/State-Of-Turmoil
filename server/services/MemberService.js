@@ -11,6 +11,7 @@ const MemberActions = {
   FRIEND_REQUEST_RESPONSE: 'FRIEND_REQUEST_RESPONSE',
   HEAL: 'HEAL',
   LEVEL_UP: 'LEVEL_UP',
+  PURCHASE_ITEM: 'PURCHASE_ITEM',
   READ_ALERT: 'READ_ALERT',
   REMOVE_FRIEND: 'REMOVE_FRIEND',
   SEND_FRIEND_REQUEST: 'SEND_FRIEND_REQUEST',
@@ -103,6 +104,8 @@ MemberService.doAction = async (id, body) => {
       return await friend_request_response(id, body.response_data);
     case MemberActions.HEAL:
       return await heal(id);
+    case MemberActions.PURCHASE_ITEM:
+      return await purchase_item(id, body.purchase);
     case MemberActions.READ_ALERT:
       return await read_alert(id, body.alert);
     case MemberActions.REMOVE_FRIEND:
@@ -411,6 +414,87 @@ const remove_friend = async (id, friend_id) => {
     return Promise.resolve({ status: 200, payload: { success: true } });
   }
   return Promise.resolve({ status: 500, payload: { success: false, error: 'Something Went Wrong!' } });
+}
+
+const purchase_item = async (id, data) => {
+  const users = db.getDB().collection('users');
+  let user = await users.findOne({ _id: id });
+  let company = await CompService.getCompany(data.compId);
+  let payload = {};
+
+  // Validate User exists
+  if (!user) {
+    payload = { success: false, error: 'User Not Found!' };
+    return Promise.resolve({ status: 404, payload });
+  }
+
+  // Validate Company exists
+  if (!company) {
+    payload = { success: false, error: 'Company Not Found!' };
+    return Promise.resolve({ status: 404, payload });
+  }
+
+  // Validate offer exists
+  let comp_offer = company.productOffers.find(o => o.id === data.offer.id);
+  if (!comp_offer) {
+    payload = { success: false, error: 'Product Offer Not Found!' };
+    return Promise.resolve({ status: 404, payload });
+  }
+
+  // Validate user has sufficient funds
+  // SOME ISSUE HERE
+  let user_cc = user.wallet.find(cc => cc.currency === company.funds.currency) || ({ amount: 0.00 });
+  let total_cost = (comp_offer.price * data.purchaseAmount);
+  if (user_cc.amount < total_cost) {
+    payload = { success: false, error: 'Insufficient Funds!' };
+    return Promise.resolve({ status: 400, payload });
+  }
+
+  let comp_updates = {};
+  let user_updates = {};
+  // Subtract amount from offer, delete offer if no remaining stock
+  if (comp_offer.quantity === data.purchaseAmount) {
+    company.productOffers.splice(company.productOffers.indexOf(comp_offer), 1);
+    comp_updates.productOffers = [...company.productOffers];
+  } else if (comp_offer.quantity > data.purchaseAmount) {
+    company.productOffers.splice(company.productOffers.indexOf(comp_offer), 1);
+    comp_offer.quantity -= data.purchaseAmount;
+    comp_updates.productOffers = [...company.productOffers, comp_offer];
+  } else {
+    // comp_offer.quantity < data.purchaseAmount
+    payload = { success: false, error: 'Cannot Purchase More Items Than Offered' };
+    return Promise.resolve({ status: 400, payload });
+  }
+
+  // Handle Money Transfer
+  let new_comp_amount = company.funds.amount;
+  new_comp_amount += total_cost;
+  comp_updates.funds = { ...company.funds, amount: new_comp_amount };
+  user.wallet.splice(user.wallet.indexOf(user_cc), 1);
+  user_cc.amount -= total_cost;
+  user_updates.wallet = [...user.wallet, user_cc];
+
+  // Add item(s) to user inventory
+  let item = user.inventory.find(i => i.id === comp_offer.id);
+  if (item) {
+    user.inventory.splice(user.inventory.indexOf(item), 1);
+    item.quantity += data.purchaseAmount;
+    user_updates.inventory = [...user.inventory, item]; 
+  } else {
+    user_updates.inventory = [...user.inventory, { id: comp_offer.id, quantity: data.purchaseAmount }];
+  }
+
+  let updated_user = await users.findOneAndUpdate({ _id: id }, { $set: user_updates });
+  let updated_comp = await db.getDB().collection('companies')
+    .findOneAndUpdate({ _id: data.compId }, { $set: comp_updates });
+
+  if (updated_user && updated_comp) {
+    payload = { success: true };
+    return Promise.resolve({ status: 200, payload });
+  }
+
+  payload = { success: false, error: 'Something Went Wrong' };
+  return Promise.resolve({ status: 500, payload });
 }
 
 const buildLevelUpAlert = level => ({
