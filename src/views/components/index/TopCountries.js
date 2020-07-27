@@ -33,7 +33,7 @@ const TopCountries = () => {
             setOptions(countries);
             setLoaded(true);
           }
-        })
+        });
     }
   });
 

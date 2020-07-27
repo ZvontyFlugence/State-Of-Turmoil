@@ -8,6 +8,7 @@ import { Card } from 'primereact/card';
 // Components
 import Public from './layouts/public';
 import TopCountries from './components/index/TopCountries';
+import TopCitizens from './components/index/TopCitizens';
 
 // Styles
 import 'styles/index.scss';
@@ -39,9 +40,7 @@ const Index = () => {
             </Card>
           </div>
           <div className='p-col-12 p-md-3'>
-            <Card>
-              Top Players
-            </Card>
+            <TopCitizens />
           </div>
         </div>
       </div>

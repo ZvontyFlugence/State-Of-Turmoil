@@ -118,7 +118,7 @@ const CompanyInfo = props => {
           />
         </div>
         <Dialog header='Confirm Purchase' visible={showConfirmModal} onHide={() => setShowConfirmModal(false)} style={{ textAlign: 'center' }}>
-          <span>Are you sure you want to buy { buyAmount } { offer_item.label } for { (buyAmount * offer.price).toFixed(2) }?</span>
+          <span>Are you sure you want to buy { buyAmount } { offer_item.label } for { (buyAmount * offer.price).toFixed(2) } { props.funds.currency }?</span>
           <br />
           <br />
           <Button label='Confirm Purchase' />

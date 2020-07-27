@@ -3,7 +3,7 @@ const auth = require('../middleware/auth');
 const StatsService = require('../services/StatsService');
 const router = express.Router();
 
-router.post('/citizens', auth, async (req, res) => {
+router.post('/citizens', async (req, res) => {
   if (!req.body.hasOwnProperty('stat')) {
     return res.status(400).json({ error: 'No Sorting Stat Provided' });
   }

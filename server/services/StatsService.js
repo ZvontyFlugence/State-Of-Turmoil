@@ -33,6 +33,10 @@ StatsService.citizenStats = async body => {
       return Promise.resolve({ status: 400, payload });
   }
 
+  if (body.hasOwnProperty('limit')) {
+    citizens = citizens.slice(0, body.limit);
+  }
+
   return Promise.resolve({ status: 200, payload: { citizens } });
 }
 
